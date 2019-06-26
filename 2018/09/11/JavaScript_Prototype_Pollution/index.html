@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>JavaScript原型链污染 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">JavaScript原型链污染</h1><h1 id="原型对象及相关基础"><a class="header-anchor" href="#原型对象及相关基础"></a>原型对象及相关基础</h1>
+<p>在JavaScript中只有一种结构:对象,也就是常说的&quot;万物皆对象&quot;。</p>
+<p>而每个实例对象都有一个原型对象,而原型对象则引申出其对应的原型对象,经过一层层的链式调用,就构成了我们常说的&quot;原型链&quot;。</p>
+<p>实例对象可以通过<code>__proto__</code>访问其原型对象:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;  <span class="keyword">let</span> obj = &#123;&#125;;</span><br><span class="line">&lt;· <span class="literal">undefined</span></span><br><span class="line">&gt;  obj.__proto__;</span><br><span class="line">&lt;· &#123;<span class="attr">constructor</span>: ƒ, <span class="attr">__defineGetter__</span>: ƒ, <span class="attr">__defineSetter__</span>: ƒ, <span class="attr">hasOwnProperty</span>: ƒ, <span class="attr">__lookupGetter__</span>: ƒ, …&#125;</span><br></pre></td></tr></table></figure>
+<p>而经过不断的调用,最终的原型对象会调用到<code>null</code>,这将作为该原型链的最后一个环节,与之对应的,作为终点的<code>null</code>自然也是没有原型对象的。比如,我们继续在上面的例子中调用其原型对象:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;  obj.__proto__.__proto__;</span><br><span class="line">&lt;· <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+<p>在JavaScript中,可以用几种方式实现继承,常见的继承方式包括:<code>原型链继承</code>、<code>借用构造函数继承</code>、<code>原型式继承</code>,<code>寄生式继承</code>。</p>
+<p>每种方法对应的原理及具体的实现方式不再赘述,可参见《JavaScript高级程序语言设计》中的继承相关章节。</p>
+<p>在Javascript中可以通过<code>example.a.b</code>或<code>example.a[&quot;b&quot;]</code>来对数组进行访问,<code>example.a</code>访问的是<code>example</code>对象下的<code>a</code>对象的<code>b</code>,而<code>example.a[&quot;b&quot;]</code>则是访问<code>example</code>对象下的<code>a</code>数组的下标为<code>b</code>的值。</p>
+<p>由于对象是无序的,当使用第二种方式访问对象时,只能使用指明下标的方式去访问。</p>
+<p>因此我们可以通过<code>a[&quot;__proto__&quot;]</code>的方式去访问其原型对象。</p>
+<h1 id="实例"><a class="header-anchor" href="#实例"></a>实例</h1>
+<p>在Hackit 2018中,有一个nodejs的题目,其中便涉及到了使用原型链继承来进行变量覆盖的攻击手法,源码我已同步至我的Github项目中<a href="https://github.com/otakekumi/CTF-Challenge/blob/master/nodejs/chall_4/app.js" target="_blank" rel="noopener">CTF-Challenge</a>。</p>
+<p>其中漏洞点在第64行:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">matrix[client.row][client.col] = client.data;</span><br></pre></td></tr></table></figure>
+<p>而<code>data</code>是从网页传递的参数,形如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;row&quot;:1,&quot;col&quot;:&quot;1&quot;,&quot;data&quot;:&quot;X&quot;&#125;</span><br></pre></td></tr></table></figure>
+<p>对应的<code>row</code>以及<code>col</code>值会存放至<code>matrix</code>中,而这里则会导致一个原型链污染的隐患。</p>
+<p>回到题目本身的逻辑中,获得Flag的要求为:</p>
+<blockquote>
+<p>传入的<code>querytoken</code>与<code>user.admintoken</code>的md5哈希值一样</p>
+</blockquote>
+<p>因此我们可以通过上面发现的原型链的漏洞对<code>admintoken</code>进行赋值。那么继续探讨如何对其进行赋值。</p>
+<p><code>Array</code>实例继承自<code>Array.prototype</code>,因此我们可以通过更改构造函数的原型对象来对所有的<code>Array</code>实例进行修改。</p>
+<p>那么我们可以通过这个思路来做到变量覆盖。</p>
+<p>通过代码我们可以发现<code>user</code>为<code>Array</code>,<code>matrix</code>同样是<code>Array</code>,因此我们根据上面的思路,通过对<code>matrix</code>进行赋值进而篡改<code>user.admintoken</code>的值。</p>
+<p>在控制台演示原型链污染如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt;  a=[];</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  b=[];</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  b[&quot;__proto__&quot;];</span><br><span class="line">&lt;· [constructor: ƒ, concat: ƒ, find: ƒ, findIndex: ƒ, pop: ƒ, …]</span><br><span class="line">&gt;  b[&quot;__proto__&quot;][&quot;admintoken&quot;]=&quot;ccda&quot;;</span><br><span class="line">&lt;· &quot;ccda&quot;</span><br><span class="line">&gt;  a</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  a.admintoken</span><br><span class="line">&lt;· &quot;ccda&quot;</span><br></pre></td></tr></table></figure>
+<p>因此我们传入的payload就可以构造出来了。</p>
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+$('pre').addClass('prettyprint linenums');
+prettyPrint();
+});
+$(".gutter").remove();</script></body></html>

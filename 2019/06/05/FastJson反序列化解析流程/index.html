@@ -1,0 +1,94 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>FastJson反序列化解析流程 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">FastJson反序列化解析流程</h1><h2 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h2>
+<p>这是一篇炒冷饭性质的文章，距离FastJson的反序列化漏洞曝出已经过去了差不多两年的时间，网上相关的漏洞分析文章也是十分充足，但是我最近在阅读相关文章的时候发现普遍都是分析漏洞利用环节，许多解析部分的细节便不可得知。于是用了些时间分析了下其解析流程，也就有了本文。本篇内容主要为FastJson反序列化解析流程中涉及到的类及函数的分析。</p>
+<h2 id="整体调用栈"><a class="markdownIt-Anchor" href="#整体调用栈"></a> 整体调用栈</h2>
+<p><img src="/img/15595843025965.jpg" alt="-w634"></p>
+<h2 id="解析过程中的关键类"><a class="markdownIt-Anchor" href="#解析过程中的关键类"></a> 解析过程中的关键类</h2>
+<p>在用以调试的demo中，处理JSON数据的语句为:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JSONObject obj = JSON.parseObject(data,Feature.SupportNonPublicField);</span><br></pre></td></tr></table></figure>
+<p>整个JSON数据的处理也就是从<code>parseObject</code>这个函数开始。</p>
+<h3 id="comalibabafastjsonparserdefaultjsonparser"><a class="markdownIt-Anchor" href="#comalibabafastjsonparserdefaultjsonparser"></a> com.alibaba.fastjson.parser.DefaultJSONParser</h3>
+<p>从demo开始，进入的第一个类本应是<code>JSON</code>，但是因为JSON类并未进行关键操作，因此就采取忽略，转而关注在<code>com.alibaba.fastjson.JSON:74</code>处调用的DefaultJSONParser。</p>
+<p>在DefaultJSONParser中，我们需要关注的函数有两个:</p>
+<ul>
+<li>parse</li>
+<li>parseObject</li>
+</ul>
+<p>借助这两个函数，<code>DefaultJSONParser</code>完成了对于JSON数据的解析。</p>
+<h3 id="comalibabafastjsonparserdeserializerfielddeserializer"><a class="markdownIt-Anchor" href="#comalibabafastjsonparserdeserializerfielddeserializer"></a> com.alibaba.fastjson.parser.deserializer.FieldDeserializer</h3>
+<p>在Java反射中，可以通过Field获取某个类的属性或该属性的值，类<code>FieldDeserializer</code>用于存储字段所对应的反序列化器，FiledDeserializer会存储至ObjectDeserializer中，其中Key对应为字段名称。</p>
+<p>在<code>FieldDeserializer</code>类中，主要由几类函数组成:</p>
+<ul>
+<li>构造函数</li>
+<li>parseField</li>
+<li>setValue</li>
+<li>getFastMatchToken</li>
+</ul>
+<h3 id="comalibabafastjsonparserjavabeandeserializer"><a class="markdownIt-Anchor" href="#comalibabafastjsonparserjavabeandeserializer"></a> com.alibaba.fastjson.parser.JavaBeanDeserializer</h3>
+<p><code>JavaBeanDeserializer</code>是一个反序列化器，也就是我们上面在<code>FieldDeserializer</code>中提到的&quot;反序列器&quot;。</p>
+<p><code>JavaBeanDeserializer</code>在进行反序列化时，会接受如下参数:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> &lt;T&gt; <span class="function">T <span class="title">deserialze</span><span class="params">(DefaultJSONParser parser, Type type, Object fieldName, Object object, <span class="keyword">int</span> features)</span></span></span><br></pre></td></tr></table></figure>
+<p><img src="/img/15595442544469.jpg" alt="-w648"></p>
+<h2 id="解析过程中的关键函数"><a class="markdownIt-Anchor" href="#解析过程中的关键函数"></a> 解析过程中的关键函数</h2>
+<h3 id="comalibabafastjsonparserdefaultjsonparserparseobject"><a class="markdownIt-Anchor" href="#comalibabafastjsonparserdefaultjsonparserparseobject"></a> com.alibaba.fastjson.parser.DefaultJSONParser$parseObject</h3>
+<p>在此函数中，<code>DefaultJSONParser</code>会完成对于JSON数据的处理，我们所追求的命令执行也是在这一步中实现。该函数的主体实现包裹在一个<code>while(True)</code>循环中，在这个while循环中，会不断取JSON数据中的下一个token(也就是字符)进行处理:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">    lexer.skipWhitespace();</span><br><span class="line">    <span class="keyword">char</span> ch = lexer.getCurrent(); <span class="comment">/* 比如 ch = '"' */</span></span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>以下面这个demo为例子:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;name&quot;:&#123;&quot;@type&quot;:&quot;...&quot;&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>会首先取出<code>name</code>添加至<code>SymbolTable</code>，再深入对<code>name</code>键对应的数据进行循环处理。</p>
+<h3 id="comalibabafastjsonparserjsonlexerbasescansymbol"><a class="markdownIt-Anchor" href="#comalibabafastjsonparserjsonlexerbasescansymbol"></a> com.alibaba.fastjson.parser.JSONLexerBase$scanSymbol</h3>
+<p><code>scanSymbol</code>主要调用点在刚才提到的parseObject中:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">key = lexer.scanSymbol(<span class="keyword">this</span>.symbolTable, <span class="string">'"'</span>);</span><br></pre></td></tr></table></figure>
+<p>在<code>scanSymbol</code>函数中，会首先取出键，比如下面这个例子中的<code>name</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;name&quot;:&quot;...&quot;&#125;</span><br></pre></td></tr></table></figure>
+<p>在取出键之后，会调用<code>addSymbol</code>函数，将<code>name</code>这个键名添加至<code>SymbolTable</code>中:<br>
+<img src="/img/15593937589142.jpg" alt="-w276"></p>
+<h3 id="comalibabafastjsonparserparserconfigdeserialze"><a class="markdownIt-Anchor" href="#comalibabafastjsonparserparserconfigdeserialze"></a> com.alibaba.fastjson.parser.ParserConfig$deserialze</h3>
+<p>谈及该函数，必然需要理解<code>ParserConfig</code>类，<code>ParserConfig</code>在反序列化的过程维护了常用类型和反序列化器的对应关系，并将该对应关系存放至<code>IdentityHashMap</code>。我们可以通过<code>getDeserializer</code>方法获得对象反序列化器<code>ObjectDeserializer</code>。</p>
+<p>当出现未定义的类型时，则会在获取该类型的反序列化器的同时建立起对应关系，并存放至<code>IdentityHashMap</code>。为了更好地理解它，可以举一个例子:<code>ParserConfig$getDeserializer(Type type)</code>，我们可以分析其实现源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ObjectDeserializer derializer = (ObjectDeserializer)<span class="keyword">this</span>.derializers.get(type);</span><br><span class="line"><span class="keyword">if</span> (derializer != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> derializer;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (type <span class="keyword">instanceof</span> Class) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.getDeserializer((Class)type, type);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (type <span class="keyword">instanceof</span> ParameterizedType) &#123;</span><br><span class="line">    Type rawType = ((ParameterizedType)type).getRawType();</span><br><span class="line">    <span class="keyword">return</span> rawType <span class="keyword">instanceof</span> Class ? <span class="keyword">this</span>.getDeserializer((Class)rawType, type) : <span class="keyword">this</span>.getDeserializer(rawType);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> JavaObjectDeserializer.instance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该函数为获取ParserConfig中存储的反序列化器，当反序列化器存在时，则直接将其返回，不存在时则调用<code>getDeserializer(Class&lt;?&gt; clazz, Type type)</code>，获取类与反序列器的对应关系，并在最后存入<code>IdentityHashMap</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.putDeserializer((Type)type, (ObjectDeserializer)derializer);</span><br></pre></td></tr></table></figure>
+<h3 id="parsefield"><a class="markdownIt-Anchor" href="#parsefield"></a> parseField</h3>
+<p>由于该函数存在重名实现，因此以序号分开。</p>
+<ol>
+<li>com.alibaba.fastjson.parser.deserializer.JavaBeanDeserializer$parseField</li>
+<li>com.alibaba.fastjson.parser.deserializer.DefaultFieldDeserializer$parseField</li>
+</ol>
+<p>虽然上述的两个函数重名，然而在一般情况下，<code>DefaultFieldDeserializer$parseField</code>在<code>JavaBeanDeserializer$parseField</code>中被调用:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">            lexer.nextTokenWithColon(((FieldDeserializer)fieldDeserializer).getFastMatchToken());</span><br><span class="line">    ((FieldDeserializer)fieldDeserializer).parseField(parser, object, objectType, fieldValues);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<code>JavaBeanDeserializer$parseField</code>中，当检测到存在与传入的Key所匹配的反序列化器时，便会调用<code>DefaultFieldDeserializer$parseField</code>进行反序列化。</p>
+<p>当进入<code>DefaultFieldDeserializer$parseField</code>时，我们可以看到<code>this</code>中已经存在<code>fieldValueDeserializer</code>了:<br>
+<img src="/img/15595801293328.jpg" alt="-w385"></p>
+<p>随后调用对应的反序列化器，这里以我图中为例:<br>
+<img src="/img/15595802147440.jpg" alt="-w545"><br>
+对应的语句为:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value = <span class="keyword">this</span>.fieldValueDeserilizer.deserialze(parser, fieldType, <span class="keyword">this</span>.fieldInfo.name);</span><br></pre></td></tr></table></figure>
+<h3 id="comalibabafastjsonparserdeserializerfielddeserializersetvalue"><a class="markdownIt-Anchor" href="#comalibabafastjsonparserdeserializerfielddeserializersetvalue"></a> com.alibaba.fastjson.parser.deserializer.FieldDeserializer$setValue</h3>
+<p><code>setValue</code>接受两个传参:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(Object object, Object value)</span></span></span><br></pre></td></tr></table></figure>
+<p><code>object</code>为类对象，<code>value</code>为属性值。<br>
+<img src="/img/15597250488468.jpg" alt="-w338"></p>
+<p>在<code>setValue</code>中会进行字段的赋值操作，对object的get方法进行触发，当检测到method返回的类型与Map类型一致时，则会进一步触发反射，完成RCE，关键代码如下所示:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">else</span> <span class="keyword">if</span> (Map.class.isAssignableFrom(method.getReturnType())) &#123;</span><br><span class="line">    Map map = (Map)method.invoke(object);</span><br><span class="line">    <span class="keyword">if</span> (map != <span class="keyword">null</span>) &#123;</span><br><span class="line">        map.putAll((Map)value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中，<code>method</code>为:<br>
+<img src="/img/15597255700895.jpg" alt="-w860"></p>
+<h3 id="comalibabafastjsonutiljavabeaninfojavabeaninfobuild"><a class="markdownIt-Anchor" href="#comalibabafastjsonutiljavabeaninfojavabeaninfobuild"></a> com.alibaba.fastjson.util.JavaBeanInfo.JavaBeanInfo$build</h3>
+<p><code>build</code>函数接受三个参数传入:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> JavaBeanInfo <span class="title">build</span><span class="params">(Class&lt;?&gt; clazz, Type type, PropertyNamingStrategy propertyNamingStrategy)</span></span></span><br></pre></td></tr></table></figure>
+<p>在<code>build</code>函数中，通过反射获得传入参数的<code>clazz</code>类及父类的所有方法，随后遍历这些方法，将其中的set方法以及get方法取出，如图中<code>fields</code>所示:<br>
+<img src="/img/15594959720656.jpg" alt="-w395"></p>
+<p>其中，<code>beanInfo</code>的生成的语句为:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beanInfo = JavaBeanInfo.build(clazz, type, <span class="keyword">this</span>.propertyNamingStrategy);</span><br></pre></td></tr></table></figure>
+<h2 id="reference"><a class="markdownIt-Anchor" href="#reference"></a> Reference</h2>
+<ul>
+<li><a href="https://paper.seebug.org/636/" target="_blank" rel="noopener">FastJson 反序列化漏洞利用的三个细节 - TemplatesImpl 利用链</a></li>
+<li><a href="http://xxlegend.com/2017/04/29/title-%20fastjson%20%E8%BF%9C%E7%A8%8B%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96poc%E7%9A%84%E6%9E%84%E9%80%A0%E5%92%8C%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">fastjson 远程反序列化poc的构造和分析</a></li>
+<li><a href="https://www.oschina.net/question/54100_25366" target="_blank" rel="noopener">FastJson技术内幕</a></li>
+<li><a href="https://paper.seebug.org/916/#addcharacter" target="_blank" rel="noopener">XMLDecoder解析流程分析</a></li>
+<li><a href="https://github.com/shengqi158/fastjson-remote-code-execute-poc/blob/master/Java_JSON%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8B%E6%AE%87_%E7%9C%8B%E9%9B%AA%E5%AE%89%E5%85%A8%E5%BC%80%E5%8F%91%E8%80%85%E5%B3%B0%E4%BC%9A.pdf" target="_blank" rel="noopener">Java Json反序列化之殇</a></li>
+</ul>
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+$('pre').addClass('prettyprint linenums');
+prettyPrint();
+});
+$(".gutter").remove();</script></body></html>

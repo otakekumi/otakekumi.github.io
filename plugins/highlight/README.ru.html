@@ -1,0 +1,84 @@
+<h1 id="highlightjs"><a class="markdownIt-Anchor" href="#highlightjs"></a> Highlight.js</h1>
+<p>Highlight.js — это инструмент для подсветки синтаксиса, написанный на JavaScript. Он работает<br />
+и в браузере, и на сервере. Он работает с практически любой HTML разметкой, не<br />
+зависит от каких-либо фреймворков и умеет автоматически определять язык.</p>
+<h2 id="начало-работы"><a class="markdownIt-Anchor" href="#начало-работы"></a> Начало работы</h2>
+<p>Минимум, что нужно сделать для использования highlight.js на веб-странице — это<br />
+подключить библиотеку, CSS-стили и вызывать <a href="http://highlightjs.readthedocs.io/en/latest/api.html#inithighlightingonload"><code>initHighlightingOnLoad</code></a>:</p>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/path/to/styles/default.css"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/path/to/highlight.pack.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span>hljs.initHighlightingOnLoad();<span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p>Библиотека найдёт и раскрасит код внутри тегов <code>&lt;pre&gt;&lt;code&gt;</code>, попытавшись<br />
+автоматически определить язык. Когда автоопределение не срабатывает, можно явно<br />
+указать язык в атрибуте class:</p>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">code</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"html"</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">code</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
+</code></pre>
+<p>Список поддерживаемых классов языков доступен в <a href="http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html">справочнике по классам</a>.<br />
+Класс также можно предварить префиксами <code>language-</code> или <code>lang-</code>.</p>
+<p>Чтобы отключить подсветку для какого-то блока, используйте класс <code>nohighlight</code>:</p>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">code</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nohighlight"</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">code</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
+</code></pre>
+<h2 id="инициализация-вручную"><a class="markdownIt-Anchor" href="#инициализация-вручную"></a> Инициализация вручную</h2>
+<p>Чтобы иметь чуть больше контроля за инициализацией подсветки, вы можете<br />
+использовать функции <a href="http://highlightjs.readthedocs.io/en/latest/api.html#highlightblock-block"><code>highlightBlock</code></a> и <a href="http://highlightjs.readthedocs.io/en/latest/api.html#configure-options"><code>configure</code></a>. Таким образом<br />
+можно управлять тем, <em>что</em> и <em>когда</em> подсвечивать.</p>
+<p>Вот пример инициализации, эквивалентной вызову <a href="http://highlightjs.readthedocs.io/en/latest/api.html#inithighlightingonload"><code>initHighlightingOnLoad</code></a>, но<br />
+с использованием <code>document.addEventListener</code>:</p>
+<pre class="highlight"><code class="js"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, (event) =&gt; {
+  <span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">'pre code'</span>).forEach(<span class="hljs-function">(<span class="hljs-params">block</span>) =&gt;</span> {
+    hljs.highlightBlock(block);
+  });
+});
+</code></pre>
+<p>Вы можете использовать любые теги разметки вместо <code>&lt;pre&gt;&lt;code&gt;</code>. Если<br />
+используете контейнер, не сохраняющий переводы строк, вам нужно сказать<br />
+highlight.js использовать для них тег <code>&lt;br&gt;</code>:</p>
+<pre class="highlight"><code class="js">hljs.configure({<span class="hljs-attr">useBR</span>: <span class="hljs-literal">true</span>});
+
+<span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">'div.code'</span>).forEach(<span class="hljs-function">(<span class="hljs-params">block</span>) =&gt;</span> {
+  hljs.highlightBlock(block);
+});
+</code></pre>
+<p>Другие опции можно найти в документации функции <a href="http://highlightjs.readthedocs.io/en/latest/api.html#configure-options"><code>configure</code></a>.</p>
+<h2 id="web-workers"><a class="markdownIt-Anchor" href="#web-workers"></a> Web Workers</h2>
+<p>Подсветку можно запустить внутри web worker’а, чтобы окно<br />
+браузера не подтормаживало при работе с большими кусками кода.</p>
+<p>В основном скрипте:</p>
+<pre class="highlight"><code class="js">addEventListener(<span class="hljs-string">'load'</span>, () =&gt; {
+  <span class="hljs-keyword">const</span> code = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'#code'</span>);
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> Worker(<span class="hljs-string">'worker.js'</span>);
+  worker.onmessage = <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> { code.innerHTML = event.data; }
+  worker.postMessage(code.textContent);
+});
+</code></pre>
+<p>В worker.js:</p>
+<pre class="highlight"><code class="js">onmessage = <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
+  importScripts(<span class="hljs-string">'&lt;path&gt;/highlight.pack.js'</span>);
+  <span class="hljs-keyword">const</span> result = self.hljs.highlightAuto(event.data);
+  postMessage(result.value);
+};
+</code></pre>
+<h2 id="установка-библиотеки"><a class="markdownIt-Anchor" href="#установка-библиотеки"></a> Установка библиотеки</h2>
+<p>Highlight.js можно использовать в браузере прямо с CDN хостинга или скачать<br />
+индивидуальную сборку, а также установив модуль на сервере. На<br />
+<a href="https://highlightjs.org/download/">странице загрузки</a> подробно описаны все варианты.</p>
+<p><strong>Не подключайте GitHub напрямую.</strong> Библиотека не предназначена для<br />
+использования в виде исходного кода, а требует отдельной сборки. Если вам не<br />
+подходит ни один из готовых вариантов, читайте <a href="http://highlightjs.readthedocs.io/en/latest/building-testing.html">документацию по сборке</a>.</p>
+<p><strong>Файл на CDN содержит не все языки.</strong> Иначе он будет слишком большого размера.<br />
+Если нужного вам языка нет в <a href="https://highlightjs.org/download/">категории “Common”</a>, можно дообавить его<br />
+вручную:</p>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/languages/go.min.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+<p><strong>Про Almond.</strong> Нужно задать имя модуля в оптимизаторе, например:</p>
+<pre class="highlight"><code class="">r.js -o name=hljs paths.hljs=/path/to/highlight out=highlight.js
+</code></pre>
+<h2 id="лицензия"><a class="markdownIt-Anchor" href="#лицензия"></a> Лицензия</h2>
+<p>Highlight.js распространяется под лицензией BSD. Подробнее читайте файл<br />
+<a href="https://github.com/highlightjs/highlight.js/blob/master/LICENSE">LICENSE</a>.</p>
+<h2 id="ссылки"><a class="markdownIt-Anchor" href="#ссылки"></a> Ссылки</h2>
+<p>Официальный сайт билиотеки расположен по адресу <a href="https://highlightjs.org/">https://highlightjs.org/</a>.</p>
+<p>Более подробная документация по API и другим темам расположена на<br />
+<a href="http://highlightjs.readthedocs.io/">http://highlightjs.readthedocs.io/</a>.</p>
+<p>Авторы и контрибьюторы перечислены в файле <a href="https://github.com/highlightjs/highlight.js/blob/master/AUTHORS.ru.txt">AUTHORS.ru.txt</a> file.</p>

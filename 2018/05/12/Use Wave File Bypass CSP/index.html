@@ -1,9 +1,9 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>Use Wave File Bypass CSP [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">Use Wave File Bypass CSP</h1><h2 id="csp-introduction"><a class="header-anchor" href="#csp-introduction"></a>CSP Introduction</h2>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>Use Wave File Bypass CSP [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">Use Wave File Bypass CSP</h1><h2 id="csp-introduction"><a class="markdownIt-Anchor" href="#csp-introduction"></a> CSP Introduction</h2>
 <p>CSP全称Content Security Policy，即内容安全策略。CSP是一个额外的安全层，用于检测并削弱某些特定类型的攻击，包括XSS和注入。</p>
 <p>CSP被设计为完全向后兼容，在不同的浏览器上，不会因是否支持CSP而产生冲突问题。在不进行特定设置之前，默认为网页使用标准的同源策略。</p>
 <p>通常可以使用meta标签来设置CSP，或者使用php的header函数来进行相关属性的设置。</p>
 <p>CSP的配置会直接影响到页面加载资源的方式，在适当配置的情况下，可以有效的防范XSS攻击。</p>
-<h2 id="csp-configuration"><a class="header-anchor" href="#csp-configuration"></a>CSP Configuration</h2>
+<h2 id="csp-configuration"><a class="markdownIt-Anchor" href="#csp-configuration"></a> CSP Configuration</h2>
 <p>我们通过Content-Security-Policy头信息来进行CSP的设置，通常格式如下:</p>
 <blockquote>
 <p>Content-Security-Policy: policy</p>
@@ -11,12 +11,12 @@
 <p>其中，policy部分对应的为具体的内容安全策略。</p>
 <p>一个策略由一系列的策略指令组成，每个策略都描述了一个针对某个特定类型资源以及生效范围的策略。</p>
 <p>网上对于相关指令和资源表的说明已经很多了，我就不再赘述。</p>
-<h2 id="bypass-csp-with-different-policy"><a class="header-anchor" href="#bypass-csp-with-different-policy"></a>Bypass CSP With Different Policy</h2>
-<h3 id="common-policy-bypass"><a class="header-anchor" href="#common-policy-bypass"></a>Common Policy Bypass</h3>
+<h2 id="bypass-csp-with-different-policy"><a class="markdownIt-Anchor" href="#bypass-csp-with-different-policy"></a> Bypass CSP With Different Policy</h2>
+<h3 id="common-policy-bypass"><a class="markdownIt-Anchor" href="#common-policy-bypass"></a> Common Policy Bypass</h3>
 <p>目前在比赛中常见的绕过CSP一般是:</p>
 <blockquote>
-<p>script-src ‘self’ 'unsafe-inline’<br>
-script-src ‘self’ 'unsafe-eval’<br>
+<p>script-src ‘self’ ‘unsafe-inline’<br>
+script-src ‘self’ ‘unsafe-eval’<br>
 script-src ‘nonce-*****’</p>
 </blockquote>
 <p>通常情况下，除了CSP之外，还都会搭配一定的过滤措施来让选手进行绕过。</p>
@@ -33,7 +33,7 @@ script-src ‘nonce-*****’</p>
 <blockquote>
 <p><a href="http://countersite.org/articles/web-vulnerability/83-web-writeup-googlectf-wallowing-wallabies.html" target="_blank" rel="noopener">http://countersite.org/articles/web-vulnerability/83-web-writeup-googlectf-wallowing-wallabies.html</a></p>
 </blockquote>
-<h3 id="bypass-script-src-self"><a class="header-anchor" href="#bypass-script-src-self"></a>Bypass &quot;script-src ‘self’ &quot;</h3>
+<h3 id="bypass-script-src-self"><a class="markdownIt-Anchor" href="#bypass-script-src-self"></a> Bypass &quot;script-src ‘self’ &quot;</h3>
 <p>在前几天的PlaidCTF中，出现了如下的CSP:</p>
 <blockquote>
 <p>Content-Security-Policy: style-src ‘self’ <a href="https://fonts.googleapis.com" target="_blank" rel="noopener">https://fonts.googleapis.com</a>; font-src ‘self’ <a href="https://fonts.gstatic.com" target="_blank" rel="noopener">https://fonts.gstatic.com</a>; media-src ‘self’ blob:; script-src ‘self’; object-src ‘self’; frame-src ‘self’</p>
@@ -72,10 +72,10 @@ script-src ‘nonce-*****’</p>
 <p><a href="https://www.slideshare.net/x00mario/jsmvcomfg-to-sternly-look-at-javascript-mvc-and-templating-frameworks/3-TodayJavaScript_MVC_Templating_FrameworksWhy_Because" target="_blank" rel="noopener">https://www.slideshare.net/x00mario/jsmvcomfg-to-sternly-look-at-javascript-mvc-and-templating-frameworks/3-TodayJavaScript_MVC_Templating_FrameworksWhy_Because</a></p>
 </blockquote>
 <p>首先，同样是上传GIF，使得GIF与目标网站处于同源下，然后使用Angular的class去调用这个GIF文件，然后会生成script标签，并且其src属性是GIF文件，此时GIF中的内容被作为js代码解析了，并且因为处于同源情况下，因此可以顺利触发xss。</p>
-<h3 id="comments-on-csp"><a class="header-anchor" href="#comments-on-csp"></a>Comments On CSP</h3>
+<h3 id="comments-on-csp"><a class="markdownIt-Anchor" href="#comments-on-csp"></a> Comments On CSP</h3>
 <p>CSP作为内容安全策略，在合理配置的情况，可以极大的提高xss的攻击成本，以达到较好的防御效果，然而部署成本同样较高，一是熟练掌握相关策略带来的难度，一是配置CSP所带来的工作量。</p>
 <p>CSP的不当配置不仅会引发安全问题，还有可能导致页面资源加载失败，但总的来说，CSP仍然是防范XSS攻击较为优秀的措施。</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
 });

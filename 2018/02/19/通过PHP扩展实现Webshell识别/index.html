@@ -3,7 +3,7 @@
 (好气啊，错过了双倍稿费<br>
 因为要写的东西有点多，并且牵涉到的知识对我也比较有挑战，所以我会分成几个小节来写，第一个小节我主要是谈一下大体的思路和一些必备的知识，不会涉及到过多的语言细节。</p>
 </blockquote>
-<h2 id="前言"><a class="header-anchor" href="#前言"></a>前言</h2>
+<h2 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h2>
 <p>之前线下赛的时候被官方隐藏的后门给坑过许多次，基本都是非常自信的拿rips扫了一下就放下心来，结果阴沟里翻船。</p>
 <p>所以在翻了许多次船之后，想到了通过编写PHP扩展来实现Webshell的识别。当然，这篇在线下赛的意义可能不大（权限应该是不够的），因为对于这部分的东西，我也是一边学一边记录，所以可能会有一些出错的地方，还请理解。</p>
 <p>最耿直的shell便是这种格式：</p>
@@ -15,8 +15,8 @@
 <p>而有关这方面的更具体的东西，因为并不是我们这篇文章要讨论的主要方面，因此不再多提，有兴趣可以看看p师傅的博客：<a href="https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html" target="_blank" rel="noopener">https://www.leavesongs.com/PENETRATION/webshell-without-alphanum.html</a></p>
 <p>webshell为了执行命令，最终都会去调用system,eval这一类的函数。因此在正常情况下，我们编写的waf便是通过检测关键字来识别webshell，而waf越强，识别能力也就越强，这是目前最流行的做法。</p>
 <p>但是在使用PHP扩展时，我们可以换个思路来进行识别。</p>
-<h2 id="基础知识"><a class="header-anchor" href="#基础知识"></a>基础知识</h2>
-<h3 id="php的执行流程"><a class="header-anchor" href="#php的执行流程"></a>php的执行流程</h3>
+<h2 id="基础知识"><a class="markdownIt-Anchor" href="#基础知识"></a> 基础知识</h2>
+<h3 id="php的执行流程"><a class="markdownIt-Anchor" href="#php的执行流程"></a> php的执行流程</h3>
 <p>PHP执行一段代码时，会分做几个阶段来依次完成，这里我使用Laruence总结的:</p>
 <blockquote>
 <p>1.Scanning(Lexing) ,将PHP代码转换为语言片段(Tokens)</p>
@@ -33,7 +33,7 @@
 <p>最后一步便是依次执行这些opcode。</p>
 <p>这就是为什么PHP看起来并不需要像C语言一样先编译再运行的原因，PHP是经过了解释器执行源码这个过程的。</p>
 <p>但是实时编译对于性能的影响比较大，因此在开启了APC扩展后，PHP会通过重用缓存opcode以提升运行效率。类似的还有python的pyc/pyo，Jvav的JVM，以避免重复编译带来的性能损失。</p>
-<h3 id="php危险函数调用"><a class="header-anchor" href="#php危险函数调用"></a>PHP危险函数调用</h3>
+<h3 id="php危险函数调用"><a class="markdownIt-Anchor" href="#php危险函数调用"></a> PHP危险函数调用</h3>
 <p>在进行函数调用时，需要函数的一些基本信息，比如函数名称，函数参数，函数定义等等。</p>
 <p>在这里，为了方便分析用户定义函数和PHP内置函数之间的区别，取个巧，将函数分为两类，一类是内部函数，一类是用户函数。</p>
 <p>两者之间的区别通过名称便可以很方便的发现。内部函数是用C语言实现的，但是并不是原生态的C语言，而是经过封装的，比如PHP扩展中不会使用printf()函数，而是使用经过封装处理php_printf()函数。而用户函数则是用户自定义的函数。</p>
@@ -62,7 +62,7 @@ opcode如下:</p>
 <p>我们现在大概理清楚了使用PHP编写的Webshell执行的大概流程，剩下的要做就是在eval此类危险函数即将调用时，将之hook掉。</p>
 <p>最后给出eval函数的实现，大家可以想一下如何去hook住eval，实现代码EVAL在Zend/zend_vm_def.h:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *eval_desc = zend_make_compiled_string_description(<span class="string">"eval()'d code"</span> TSRMLS_CC);</span><br><span class="line">new_op_array = zend_compile_string(inc_filename, eval_desc TSRMLS_CC);</span><br><span class="line">efree(eval_desc);</span><br></pre></td></tr></table></figure>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
 });

@@ -1,10 +1,10 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>DRDos In Memcached With Small Data [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">DRDos In Memcached With Small Data</h1><h2 id="memcached"><a class="header-anchor" href="#memcached"></a>Memcached</h2>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>DRDos In Memcached With Small Data [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">DRDos In Memcached With Small Data</h1><h2 id="memcached"><a class="markdownIt-Anchor" href="#memcached"></a> Memcached</h2>
 <p>Memcached是一个自由开源的，高性能，分布式内存对象缓存系统。</p>
 <p>本质上，它是一个简洁的key-value存储系统。</p>
 <p>一般的使用目的是，通过缓存数据库查询结果，减少数据库访问次数，以提高动态Web应用的速度、提高可扩展性</p>
-<h2 id="drdos"><a class="header-anchor" href="#drdos"></a>DRDos</h2>
+<h2 id="drdos"><a class="markdownIt-Anchor" href="#drdos"></a> DRDos</h2>
 <p>DRDos全称为&quot;istributed Reflection Denial of Service&quot;，即&quot;分布式反射拒绝服务&quot;，该方式特殊之处在于，它是通过发送大量带有被害者IP地址的数据包给主机，然后攻击主机对IP地址源做出大量回应，形成拒绝服务攻击。</p>
-<h2 id="攻击流程"><a class="header-anchor" href="#攻击流程"></a>攻击流程</h2>
+<h2 id="攻击流程"><a class="markdownIt-Anchor" href="#攻击流程"></a> 攻击流程</h2>
 <p>DRDos完成一次攻击，需要至少三个角色：</p>
 <ol>
 <li>攻击者</li>
@@ -12,7 +12,7 @@
 <li>受害者</li>
 </ol>
 <p>首先，需要发送攻击的数据载荷至反射服务器上，随后使用受害者的IP地址去请求反射服务器，然后受害者服务器便会接收到大量的恶意攻击数据包。</p>
-<h2 id="恶意数据量度"><a class="header-anchor" href="#恶意数据量度"></a>恶意数据量度</h2>
+<h2 id="恶意数据量度"><a class="markdownIt-Anchor" href="#恶意数据量度"></a> 恶意数据量度</h2>
 <p>我看的PPT是360 Kee Team的，其中提出了两种数值以供参考：</p>
 <ol>
 <li>PPS (Packets per second)</li>
@@ -25,7 +25,7 @@
 <li>发送伪装IP的服务器尽可能多</li>
 </ol>
 <p>第二条tips在Memcached中，因为Memcached系统支持最大键值单数据对1M存储，所以发送1M即可。</p>
-<h2 id="使用memcached完成drdos"><a class="header-anchor" href="#使用memcached完成drdos"></a>使用Memcached完成DRDos</h2>
+<h2 id="使用memcached完成drdos"><a class="markdownIt-Anchor" href="#使用memcached完成drdos"></a> 使用Memcached完成DRDos</h2>
 <p>首先看看Memcached本身的运行顺序，Memcached作为一个缓存系统，在浏览器首次访问时，会将数据进行缓存，在下次进行相同的查询时，会通过缓存数据库进行查询，从而达到减少数据库访问次数，以提高Web应用的速度。</p>
 <p>将DRDos的攻击流程带入到Memcached这个具体的环境中来，首先需要将恶意的数据载荷放入反射服务器上，因此为了达到这个目的，需要Memcached开启11211端口，当然，这一点就显得比较鸡肋了。</p>
 <p>第一步，使用set命令上传有效载荷。</p>
@@ -45,7 +45,7 @@
 <p>其实这里也是依赖于Memcached本身就支持TCP与UDP两种方式，因为UDP的特点，如果用来发送数据，产生丢失实在很正常，因此在上传载荷时使用TCP，而在进行反射时使用UDP.</p>
 <p>贴一个PPT中的示范：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c <span class="string">"print '\0\x01\0\0\0\x01\0\0gets a b c d e f g h j k l m n o p q r s t w v u x y a\r\n'"</span> |nc -nvvu <span class="number">10.105</span><span class="number">.16</span><span class="number">.119</span> <span class="number">11211</span> &gt;/ tmp/null</span><br></pre></td></tr></table></figure>
-<h2 id="总结"><a class="header-anchor" href="#总结"></a>总结</h2>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
 <p>看到一位师傅的博客里面写到发送20字节的数据，返回了1M的数据，放大倍数达到了5w倍，一开始没想通是怎么测出的1M，后面想了下，正因为DRDos是反射拒绝服务攻击，因此循环请求反射服务器，而数据载荷是20字节的，但是在循环过程中，打出去的数据是1M。</p>
 <p>当然，这个攻击方式也有几个缺陷：</p>
 <ol>
@@ -55,7 +55,7 @@
 <li>如果反射服务器所处的网络环境部署了对于源地址攻击行为防范机制，那么反射攻击同样也无法完成</li>
 </ol>
 <p>收获也挺大的，第一次知道Memcahced还能这么玩。</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
 });

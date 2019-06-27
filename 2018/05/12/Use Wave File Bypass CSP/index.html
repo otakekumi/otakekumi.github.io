@@ -43,16 +43,16 @@ script-src ‘nonce-*****’</p>
 <p>于是只能另外寻找突破口，在查阅大量资料后发现，可以通过引入正常的非js文件来达到引入js脚本的效果。考虑到题目中具有上传点，可以将js代码插入到尾部来进行绕过。</p>
 <p>本地搭建环境进行测试：</p>
 <p>xss.html内容为：<br>
-<img src="/img/xss.png" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/Zn5mxs.png" alt></p>
 <p>cc.wave内容为：<br>
-<img src="/img/wave.png" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/Zn5e2j.png" alt></p>
 <p>执行效果为:<br>
-<img src="/img/result.png" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/Zn5Mq0.png" alt></p>
 <p>可以看到注释部分并未对js的执行起到干扰，因此这种攻击手法是可行的。</p>
 <p>在进行上传时，后端会进行文件格式校验，因此需要在保证文件格式验证正确的情况进行绕过，在录音选项中，上传的文件为webm格式，文件头是不可见字符，在引入js文件时，会产生错误，因此需要引入文件的文件头是可见字符。</p>
 <p>这里对比下两者的文件格式便很明显了:<br>
-<img src="/img/wave1.png" alt></p>
-<p><img src="/img/webm.png" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/Zn5uMn.png" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Zn5Krq.png" alt></p>
 <p>wav格式的文件是以RIFF明文开头的，可以使用我上面所用到的攻击方法去构造xss代码，而webm开头为乱码，在执行时，会因为产生报错而中止执行。<br>
 在绕过文件格式检查之后，js会根据文件格式给定一个MIME-TYPE，在带入src属性的时候，audio的Type会和可执行脚本产生冲突，因此wav文件无法代入，而wave在MIME转换的名单之外，因此在上传成功wave文件时，其MIME-TYPE并不会与src冲突。<br>
 因此直接在description中写入:</p>

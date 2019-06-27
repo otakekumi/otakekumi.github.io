@@ -31,10 +31,10 @@
 <p>同时可以观察到，在else语句中我们使用了<code>//</code>来将后面用于在<code>php</code>和<code>python</code>运行的语句注释掉了。</p>
 <h3 id="对注释的不同解析"><a class="markdownIt-Anchor" href="#对注释的不同解析"></a> 对注释的不同解析</h3>
 <p>有关于这一点，将我们的payload放入python和php的语法高亮规则中便能理解，在python中:</p>
-<p><img src="/img/15601425170530.jpg" alt></p>
-<p>在php语法中:<img src="/img/15601425436630.jpg" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/ZnRwlt.jpg" alt></p>
+<p>在php语法中:<img src="https://s2.ax1x.com/2019/06/27/ZnRflq.jpg" alt></p>
 <p>在nodejs中:<br>
-<img src="/img/15601425731859.jpg" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/ZnRh60.md.jpg" alt></p>
 <p>如此便能同时攻击三个后端了</p>
 <h2 id="tctf-hotel-booking-system"><a class="markdownIt-Anchor" href="#tctf-hotel-booking-system"></a> Tctf Hotel Booking System</h2>
 <p>这个题目也是最可惜的一个题目，由于粗心的问题，最为关键的gadget放在注释里却没有注意到，导致寻找gadget便用了十来个小时，关键是还没找到(x</p>
@@ -43,7 +43,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://xxx/assets/(path)/(hash)/demo.jpg</span><br></pre></td></tr></table></figure>
 <p>其中，path是demo.jpg的路径，<code>hash</code>是demo.jpg文件的hash值，通过这种方式，可以利用assets来加载文件，比如jpg静态文件，官方文档地址为:<a href="http://tapestry.apache.org/assets.html" target="_blank" rel="noopener">Click Here</a></p>
 <p>在我们搭建好本地demo后，我们可以发现target下的目录结构为:<br>
-<img src="/img/15601433611771.jpg" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/ZnRT7F.jpg" alt></p>
 <p>以<code>AppModule.class</code>为例，路径便是:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">services/AppModule.class</span><br></pre></td></tr></table></figure>
 <p>而这个信息则需要串联一个较为神奇的点，在题目中，如果我们访问的文件的hash是不完整的，它会做一个自动跳转，比如我们访问:</p>
@@ -57,7 +57,7 @@
 <p>其数据分为两部分，以冒号分割，前一部分为后一部分的HMAC码，后一部分为经过序列化的数据，编码规则为:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">base64_encode(gzencode(serial_data))</span><br></pre></td></tr></table></figure>
 <p>我们将这个数据按规则解开可以发现:<br>
-<img src="/img/15601449729478.jpg" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/ZnRqh9.jpg" alt></p>
 <p>可以发现这确实是很明显的序列化数据。该数据的反序列化点则在于<code>org.apache.tapestry5.corelib.components.Form$executeStoredActions</code>:</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">String[] values = request.getParameters(FORM_DATA);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!request.getMethod().equals(<span class="string">"POST"</span>) || values == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(messages.format(<span class="string">"core-invalid-form-request"</span>, FORM_DATA));</span><br><span class="line">        ......</span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            ois = clientDataEncoder.decodeClientData(clientEncodedActions);</span><br><span class="line">            <span class="keyword">while</span> (!eventCallback.isAborted())</span><br><span class="line">            &#123;</span><br><span class="line">                String componentId = ois.readUTF();</span><br><span class="line">                <span class="keyword">boolean</span> cancelAction = ois.readBoolean();</span><br><span class="line">                ComponentAction action = (ComponentAction) ois.readObject();</span><br><span class="line">        ......</span><br></pre></td></tr></table></figure>
 <p>接下来便是找一个gadget来触发反序列化，题目中提供的信息是C3P0，后续的链也是通过C3P0完成。在调试的时候，会发现直接使用ysoserial生成的payload在readUTF时是会报错的，需要我们在生成payload时writeUTF:</p>
@@ -79,7 +79,7 @@
 <figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">match</span> handler <span class="keyword">with</span></span><br><span class="line">    | <span class="string">"register"</span> -&gt; register req body args</span><br><span class="line">    | <span class="string">"login"</span> -&gt; test_login req body args</span><br><span class="line">    | <span class="string">"load"</span> -&gt; default_load req body args </span><br><span class="line">    | <span class="string">"store"</span> -&gt; default_store req body args </span><br><span class="line">    | <span class="string">"static"</span> -&gt; static req body args</span><br><span class="line">    | <span class="string">"batch"</span> -&gt; batch req body args</span><br><span class="line">    | _ -&gt; unknown</span><br></pre></td></tr></table></figure>
 <p>跟入其对应的函数，可以发现在<code>load</code>和<code>store</code>功能中提供了单行读以及文件写功能。</p>
 <p>可以通过先注册一个账号，随后通过batch登陆，再二次空用户名登陆之后，便能做到文件读和文件写，比如:<br>
-<img src="/img/15603540968292.jpg" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/ZnRznK.jpg" alt></p>
 <p>接下来便可以通过文件写，写入ssh所需的公钥，登陆即可。</p>
 <figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">login?user?user:login??:store?../../.ssh/authorized_keys?ssh-rsa xxxxxxx</span><br></pre></td></tr></table></figure></article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');

@@ -48,10 +48,10 @@
 <p><a href="http://0.0.0.0:8080/struts2-showcase/actionchaining/com.opensymphony.xwork2.ognl.OgnlUtil@55dd2f12/register2.action" target="_blank" rel="noopener">http://0.0.0.0:8080/struts2-showcase/actionchaining/com.opensymphony.xwork2.ognl.OgnlUtil@55dd2f12/register2.action</a></p>
 </blockquote>
 <p>可以发现,这一部分的取值是能够正常进行的,而我们再看看2.3版本的exp(图是直接从其他师傅博客扒的:</p>
-<p><img src="/img/13.png" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Zn4X5D.png" alt></p>
 <p>我们可以看到,一开始调用OgnlContext去获取member_access,而我们再看下2.5版本的ExcludedClass:</p>
-<p><img src="/img/14.png" alt></p>
-<p><img src="/img/15.png" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Zn4OUO.png" alt></p>
+<p><img src="https://s2.ax1x.com/2019/06/27/Zn4LVK.png" alt></p>
 <p>因此需要对exp进行部分改动.我们可以通过setExcludedClasses与setExcludedPackageNames来覆盖默认的设置,因此我们便可以引入ognl.OgnlContext了.</p>
 <p>附上弹计算器的payload:</p>
 <blockquote>

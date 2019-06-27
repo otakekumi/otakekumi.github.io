@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>RIPS源码精读（三）：污点分析 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">RIPS源码精读（三）：污点分析</h1><h1 id="rips源码精读三污点分析"><a class="markdownIt-Anchor" href="#rips源码精读三污点分析"></a> RIPS源码精读（三）：污点分析</h1>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>RIPS源码精读（三）：污点分析 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">RIPS源码精读（三）：污点分析</h1><h1 id="rips源码精读三污点分析"><a class="markdownIt-Anchor" href="#rips源码精读三污点分析"></a> RIPS源码精读（三）：污点分析</h1>
 <h2 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h2>
 <p>因为18年下半年自己的原因，RIPS源码精读这个系列文章的更新暂停了，因此在阅读本篇文章时，无可避免会有些滞涩感，可以再过一下我的前两篇该系列文章:<br>
 <a href="https://otakekumi.github.io/2018/07/30/RIPS-1/" target="_blank" rel="noopener">RIPS源码精读(一):逻辑流程及lib文件夹大致说明</a><br>
@@ -48,8 +52,8 @@
 <p>其实到这里为止，后面的东西也没有什么需要过多描述的，由于在RIPS中没有明显的CFG构造过程，因此溯源过程看起来十分地凌乱。</p>
 <h2 id="四-最终"><a class="markdownIt-Anchor" href="#四-最终"></a> [四] 最终</h2>
 <p>第三篇咕了半年，自己本地的第一版也是大篇幅的代码分析，但是年底的时候读了一遍，发现效果很差，于是采用了这种以思路为主的描述方式，希望对之后学习相关内容的师傅有点帮助。</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

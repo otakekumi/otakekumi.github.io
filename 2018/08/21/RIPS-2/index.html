@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>RIPS源码精读(二):扫描对象的实例化及token信息的生成 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">RIPS源码精读(二):扫描对象的实例化及token信息的生成</h1><h1 id="rips源码精读二扫描对象的实例化及token信息的生成"><a class="markdownIt-Anchor" href="#rips源码精读二扫描对象的实例化及token信息的生成"></a> RIPS源码精读(二):扫描对象的实例化及token信息的生成</h1>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>RIPS源码精读(二):扫描对象的实例化及token信息的生成 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">RIPS源码精读(二):扫描对象的实例化及token信息的生成</h1><h1 id="rips源码精读二扫描对象的实例化及token信息的生成"><a class="markdownIt-Anchor" href="#rips源码精读二扫描对象的实例化及token信息的生成"></a> RIPS源码精读(二):扫描对象的实例化及token信息的生成</h1>
 <h1 id="引言"><a class="markdownIt-Anchor" href="#引言"></a> 引言</h1>
 <p>在main.php的171行附近,rips对<code>Scanner</code>类进行了实例化，并由此进入正式的分析流程.</p>
 <h1 id="内容简介"><a class="markdownIt-Anchor" href="#内容简介"></a> 内容简介</h1>
@@ -233,8 +237,8 @@
 <li>用过<code>fix_ternary</code>统一三元运算符的表达形式</li>
 </ol>
 <p>通过以上四步,我们可以得到大致处理好的token信息,而对于漏洞的扫描也是建立在上面这四步生成的token信息基础上的.</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

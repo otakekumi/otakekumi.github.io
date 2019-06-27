@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>Use Wave File Bypass CSP [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">Use Wave File Bypass CSP</h1><h2 id="csp-introduction"><a class="markdownIt-Anchor" href="#csp-introduction"></a> CSP Introduction</h2>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>Use Wave File Bypass CSP [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">Use Wave File Bypass CSP</h1><h2 id="csp-introduction"><a class="markdownIt-Anchor" href="#csp-introduction"></a> CSP Introduction</h2>
 <p>CSP全称Content Security Policy，即内容安全策略。CSP是一个额外的安全层，用于检测并削弱某些特定类型的攻击，包括XSS和注入。</p>
 <p>CSP被设计为完全向后兼容，在不同的浏览器上，不会因是否支持CSP而产生冲突问题。在不进行特定设置之前，默认为网页使用标准的同源策略。</p>
 <p>通常可以使用meta标签来设置CSP，或者使用php的header函数来进行相关属性的设置。</p>
@@ -75,8 +79,8 @@ script-src ‘nonce-*****’</p>
 <h3 id="comments-on-csp"><a class="markdownIt-Anchor" href="#comments-on-csp"></a> Comments On CSP</h3>
 <p>CSP作为内容安全策略，在合理配置的情况，可以极大的提高xss的攻击成本，以达到较好的防御效果，然而部署成本同样较高，一是熟练掌握相关策略带来的难度，一是配置CSP所带来的工作量。</p>
 <p>CSP的不当配置不仅会引发安全问题，还有可能导致页面资源加载失败，但总的来说，CSP仍然是防范XSS攻击较为优秀的措施。</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

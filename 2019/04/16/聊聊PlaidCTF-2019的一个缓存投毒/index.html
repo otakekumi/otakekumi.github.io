@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>聊聊PlaidCTF 2019的一个缓存投毒 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">聊聊PlaidCTF 2019的一个缓存投毒</h1><p>PlaidCTF2019刚结束，一共两个Web题目，目前官方还未放出Writeup，但是已经给出了exploit。做完的感受就是：国际赛真好玩儿啊。</p>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>聊聊PlaidCTF 2019的一个缓存投毒 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">聊聊PlaidCTF 2019的一个缓存投毒</h1><p>PlaidCTF2019刚结束，一共两个Web题目，目前官方还未放出Writeup，但是已经给出了exploit。做完的感受就是：国际赛真好玩儿啊。</p>
 <h2 id="初步分析"><a class="markdownIt-Anchor" href="#初步分析"></a> 初步分析</h2>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">I set up a little quotes server so that we can all share our favorite quotes with each other. I wrote it in Flask, but I decided that since it&apos;s mostly static content anyway, I should probably put some kind of caching layer in front of it, so I wrote a caching reverse proxy. It all seems to be working well, though I do get this weird error when starting up the server: </span><br><span class="line">* Environment: production</span><br><span class="line">    WARNING: Do not use the development server in a production environment.</span><br><span class="line">    Use a production WSGI server instead.</span><br><span class="line">I&apos;m sure that&apos;s not important. </span><br><span class="line">Oh, and don&apos;t bother trying to go to the /admin page, that&apos;s not for you.</span><br></pre></td></tr></table></figure>
 <p>从官方给的描述来看，后端逻辑是用Flask写的，并使用了一个反向代理缓存。同时将这个代理服务的可执行文件给了我们，我们可以通过逆向来还原缓存策略。</p>
@@ -38,8 +42,8 @@
 <li>绕过Quote内容的html实体编码</li>
 </ol>
 <p>当然最有意思的莫过于将这些看似零碎的点进行组合利用的过程了，真真是Hack For Fun.</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>NCTF2018 出题笔记 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">NCTF2018 出题笔记</h1><h1 id="nctf2018出题笔记"><a class="markdownIt-Anchor" href="#nctf2018出题笔记"></a> NCTF2018出题笔记</h1>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>NCTF2018 出题笔记 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">NCTF2018 出题笔记</h1><h1 id="nctf2018出题笔记"><a class="markdownIt-Anchor" href="#nctf2018出题笔记"></a> NCTF2018出题笔记</h1>
 <p>往年十一月份的南邮校赛都是校内关起门来自己玩，今年和小伙伴们讨论了下，尝试着对外开放，并开始探索自己的难度定级，就结果来看，比赛的举办还算是比较顺利的。<br>
 这次比赛因为自己的事，正式出题其实在比赛开始前一周的时间才开始，题目也是比较简单的类型，分别是一个Node和一个Python。</p>
 <h2 id="milktea"><a class="markdownIt-Anchor" href="#milktea"></a> MilkTea</h2>
@@ -59,8 +63,8 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCALFUNCS = &#123;<span class="string">'open'</span>: _open, <span class="string">'type'</span>: _type, <span class="string">'ctx'</span>:<span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
 <p>攻击方法基本确认，通过ctypes修改ctx的值从而进行覆盖，恢复system函数的作用，payload如下:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cc=c_int.from_address(id(ctx)+(sizeof(c_long) + sizeof(c_voidp)));cc.value=<span class="number">0</span></span><br><span class="line">system(<span class="string">'ls'</span>)</span><br></pre></td></tr></table></figure>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

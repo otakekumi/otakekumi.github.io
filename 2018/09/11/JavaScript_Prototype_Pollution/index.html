@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>JavaScript原型链污染 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">JavaScript原型链污染</h1><h1 id="原型对象及相关基础"><a class="markdownIt-Anchor" href="#原型对象及相关基础"></a> 原型对象及相关基础</h1>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>JavaScript原型链污染 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">JavaScript原型链污染</h1><h1 id="原型对象及相关基础"><a class="markdownIt-Anchor" href="#原型对象及相关基础"></a> 原型对象及相关基础</h1>
 <p>在JavaScript中只有一种结构:对象,也就是常说的&quot;万物皆对象&quot;。</p>
 <p>而每个实例对象都有一个原型对象,而原型对象则引申出其对应的原型对象,经过一层层的链式调用,就构成了我们常说的&quot;原型链&quot;。</p>
 <p>实例对象可以通过<code>__proto__</code>访问其原型对象:</p>
@@ -28,8 +32,8 @@
 <p>在控制台演示原型链污染如下:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt;  a=[];</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  b=[];</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  b[&quot;__proto__&quot;];</span><br><span class="line">&lt;· [constructor: ƒ, concat: ƒ, find: ƒ, findIndex: ƒ, pop: ƒ, …]</span><br><span class="line">&gt;  b[&quot;__proto__&quot;][&quot;admintoken&quot;]=&quot;ccda&quot;;</span><br><span class="line">&lt;· &quot;ccda&quot;</span><br><span class="line">&gt;  a</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  a.admintoken</span><br><span class="line">&lt;· &quot;ccda&quot;</span><br></pre></td></tr></table></figure>
 <p>因此我们传入的payload就可以构造出来了。</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>由Redis未授权访问引起的一次入侵 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">由Redis未授权访问引起的一次入侵</h1><blockquote>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>由Redis未授权访问引起的一次入侵 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">由Redis未授权访问引起的一次入侵</h1><blockquote>
 <p>实习期间遇到的一次入侵，服务器被人种了挖矿马，经过排查，发现是Redis未授权访问写入的ssh，加之crontab定时任务</p>
 </blockquote>
 <p>首先使用history命令查看历史操作，大概理清遇到了什么问题。</p>
@@ -39,8 +43,8 @@
 <p>4.在接下来的代码中，多次启动名为apache的程序，与top命令查看结果一致，至此，基本确定anncron文件就是不断生成cron下root文件，以及重复执行根目录下. d41d8cd98f00b204e9800998ecf8427e文件的源头。</p>
 <p>删除anacron文件，观察发现apache不再启动，补上redis的漏洞，修复完成。</p>
 <p>总结：大概流程是，攻击者利用redis漏洞，免密码ssh连接，然后下载文件，并将该文件保存为anacron文件，后面的定时也是从该文件衍生，挖矿程序至apache后不再更名的原因可能是，，攻击者无法ssh连接，只能运行最后一次下载的文件，之前删除的都是衍生物，并未删除根源，所以会重生，删除根源文件即可。</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

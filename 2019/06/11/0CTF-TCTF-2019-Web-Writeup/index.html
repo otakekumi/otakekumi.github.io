@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>0CTF/TCTF 2019 Final Web Writeup [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">0CTF/TCTF 2019 Final Web Writeup</h1><blockquote>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>0CTF/TCTF 2019 Final Web Writeup [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">0CTF/TCTF 2019 Final Web Writeup</h1><blockquote>
 <p>背锅的一次比赛</p>
 </blockquote>
 <h2 id="114514"><a class="markdownIt-Anchor" href="#114514"></a> 114514</h2>
@@ -34,7 +38,7 @@
 <p><img src="https://s2.ax1x.com/2019/06/27/ZnRwlt.jpg" alt></p>
 <p>在php语法中:<img src="https://s2.ax1x.com/2019/06/27/ZnRflq.jpg" alt></p>
 <p>在nodejs中:<br>
-<img src="https://s2.ax1x.com/2019/06/27/ZnRh60.md.jpg" alt></p>
+<img src="https://s2.ax1x.com/2019/06/27/ZnRh60.jpg" alt></p>
 <p>如此便能同时攻击三个后端了</p>
 <h2 id="tctf-hotel-booking-system"><a class="markdownIt-Anchor" href="#tctf-hotel-booking-system"></a> Tctf Hotel Booking System</h2>
 <p>这个题目也是最可惜的一个题目，由于粗心的问题，最为关键的gadget放在注释里却没有注意到，导致寻找gadget便用了十来个小时，关键是还没找到(x</p>
@@ -81,8 +85,8 @@
 <p>可以通过先注册一个账号，随后通过batch登陆，再二次空用户名登陆之后，便能做到文件读和文件写，比如:<br>
 <img src="https://s2.ax1x.com/2019/06/27/ZnRznK.jpg" alt></p>
 <p>接下来便可以通过文件写，写入ssh所需的公钥，登陆即可。</p>
-<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">login?user?user:login??:store?../../.ssh/authorized_keys?ssh-rsa xxxxxxx</span><br></pre></td></tr></table></figure></article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+<figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">login?user?user:login??:store?../../.ssh/authorized_keys?ssh-rsa xxxxxxx</span><br></pre></td></tr></table></figure></article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

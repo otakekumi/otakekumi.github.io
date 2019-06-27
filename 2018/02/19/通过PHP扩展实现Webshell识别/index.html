@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>Using PHP Extension To Recognize Webshell (To Be Continued) [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">Using PHP Extension To Recognize Webshell (To Be Continued)</h1><blockquote>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>Using PHP Extension To Recognize Webshell (To Be Continued) [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">Using PHP Extension To Recognize Webshell (To Be Continued)</h1><blockquote>
 <p>文章首发于安全客，转载请注明https://www.anquanke.com/post/id/98938<br>
 (好气啊，错过了双倍稿费<br>
 因为要写的东西有点多，并且牵涉到的知识对我也比较有挑战，所以我会分成几个小节来写，第一个小节我主要是谈一下大体的思路和一些必备的知识，不会涉及到过多的语言细节。</p>
@@ -62,8 +66,8 @@ opcode如下:</p>
 <p>我们现在大概理清楚了使用PHP编写的Webshell执行的大概流程，剩下的要做就是在eval此类危险函数即将调用时，将之hook掉。</p>
 <p>最后给出eval函数的实现，大家可以想一下如何去hook住eval，实现代码EVAL在Zend/zend_vm_def.h:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *eval_desc = zend_make_compiled_string_description(<span class="string">"eval()'d code"</span> TSRMLS_CC);</span><br><span class="line">new_op_array = zend_compile_string(inc_filename, eval_desc TSRMLS_CC);</span><br><span class="line">efree(eval_desc);</span><br></pre></td></tr></table></figure>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

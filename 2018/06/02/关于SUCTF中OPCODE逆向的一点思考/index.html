@@ -1,4 +1,8 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>关于SUCTF中OPCODE逆向的一点思考 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">关于SUCTF中OPCODE逆向的一点思考</h1><p>这次SUCTF中，我出了一道PHP OPCODE逆向的Web，应该算是国内最早出PHP OPCODE逆向的人了，稍微写一下一点思考。</p>
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>关于SUCTF中OPCODE逆向的一点思考 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">关于SUCTF中OPCODE逆向的一点思考</h1><p>这次SUCTF中，我出了一道PHP OPCODE逆向的Web，应该算是国内最早出PHP OPCODE逆向的人了，稍微写一下一点思考。</p>
 <h2 id="思路来源"><a class="markdownIt-Anchor" href="#思路来源"></a> 思路来源</h2>
 <p>这个思路是去年想到的，当时在看PHP内核方面的资料，但是一开始并没有想到这里，而是去朝着底层识别webshell的，后面在继续了解到了PHP的OPCODE之后，发现PHP的OPCODE可读性非常高，不论是对于函数的标明还是逻辑的走向，都十分的清晰，唯一的难点便是对于各种指令和PHP底层处理机制的不熟悉，在我的预计中，这一块稍微弄清楚的话，大概几个小时便可以做到。</p>
 <p>在查看了国内以及国外这方面的资料都不是很多的情况下，就萌生了出一道这方面CTF的想法，于是在寒假的时候，基本泡在了这里面，构思好了大致的题目脉络：</p>
@@ -27,8 +31,8 @@
 <p>过于纠结CTF与实战脱节我觉得是没有意义的，那么多众测活动不做，来跟一个CTF较劲不是很没趣？CTF自然是应该去挖掘更精巧，更前沿的攻击方式。</p>
 <p>当然，我并不是说CTF就应该脑洞，CTF应该给予选手适当的引导，在选手经过构思以及学习之后，能找到攻击的思路，这才是比较合理的。</p>
 <p>以上</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>$(window).on('load', function(){ 
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
-});
+//- });
 $(".gutter").remove();</script></body></html>

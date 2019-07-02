@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>不想继续撞博客主题的我 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><link rel="stylesheet" href="/css/screen.css"><link rel="stylesheet" href="/css/tag.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">不想继续撞博客主题的我</h1><blockquote>
+<p>终于动手写了一个</p>
+</blockquote>
+<p>这篇文章中小半部分讲技术，大半则是单纯闲聊。</p>
+<h2 id="第n次撞主题"><a class="markdownIt-Anchor" href="#第n次撞主题"></a> 第n次撞主题</h2>
+<p>我想，用过公开主题的人，都必然遇到过博客主题相同的问题，只是遇见数量会有些区别。而我又是一个闲下来便喜欢逛别人博客的人，遇见主题重复的可能性相比于其他用户，又高了不少。同时，我又认为我的博客是一个专属于我的分享内容的平台，从内容到样式，都不想和别人有较多的重复。</p>
+<p>于是，我陷入了一个“换主题-&gt;逛博客-&gt;发现一样的主题-&gt;换主题”的死循环。</p>
+<p>在第n次撞主题之后，终于决定还是自己花点时间来写一套自己的，比如你现在所看到的这篇博客，便是用我自己的主题来呈现的。</p>
+<h2 id="我喜欢的主题"><a class="markdownIt-Anchor" href="#我喜欢的主题"></a> 我喜欢的主题</h2>
+<p>最开始写博客的时候，我是用的Wordpress，用过的朋友应该都知道Wordpress提供了数量极多的主题，作为一个刚开始接触博客的人，我至少花了数个小时在如何选择自己博客主题上。</p>
+<p>那个时候我看过的博客还不算多，并不清楚什么样的博客才是我喜欢的，但是我还是开始漫长的“换主题”之旅。Wordpress的博客主题我大概换过不下十个，差不多一个月换一套。</p>
+<p>现在看来，当时选择的主题，包括Wordpress的整个系统都太“花”了：</p>
+<blockquote>
+<ol>
+<li>呈现了较多的无关信息</li>
+<li>让我无法专注于“写”这个事情</li>
+</ol>
+</blockquote>
+<p>对于前者，我现在有了我自己的喜好：</p>
+<blockquote>
+<p>页面除了必要的关键信息之外，不添加任何多余的组件。“标签”可以放在标签页，“评论”可以通过我博客的联系方式来联系我进行讨论，“背景”尽量使用纯色，“字体”尽量简单，“颜色”种类尽量少等等。<code>总之，减少额外信息的出现</code>。<br>
+我现在的博客虽然离我的理想状态还有一点距离，但是也相差不多了。</p>
+</blockquote>
+<p>对于后者呢？</p>
+<p>Wordpress首先需要我购买一台服务器，然后我需要搭建起运行Wordpress所需的环境，写文章需要先登陆后编辑，样式需要我单独花心思调整…</p>
+<p>这些都太累了。</p>
+<p>我希望我的博客能让我专注于“写”，不用花心思在担心服务器是否到期，格式该怎么调整等等这些无聊的问题上。</p>
+<p>当然，最好我自己还能通过代码来进行修改。</p>
+<p>找来找去，发现Github Pages最合我心意。</p>
+<p>仔细想来，最吸引我的点有两个:</p>
+<ol>
+<li>无需担心域名或是服务器到期，直接与github账号关联</li>
+<li>不用浪费精力于调整格式，直接使用markdown编辑，再统一渲染即可</li>
+</ol>
+<p>于是，我的博客进入了“Hexo时代”。</p>
+<h2 id="简短的开发"><a class="markdownIt-Anchor" href="#简短的开发"></a> 简短的开发</h2>
+<p>在决定自己写一套主题之后，接下来便是思考如何写了。</p>
+<p>模板使用pug，样式则使用最简单的CSS即可，于是通过：</p>
+<ol>
+<li>yo-theme生成一个极为简单的骨架</li>
+<li>修改pug模板，减少额外信息的出现</li>
+<li>添加CSS样式，让它符合我的审美</li>
+<li>添加代码高亮</li>
+</ol>
+<p>做完以上几步，就完成了。这是一个非常简单的主题，开发难度非常低，但是我很喜欢。细究起来，工作量最大的部分反而是CSS的部分了。</p>
+<p>喜欢的朋友可以在<a href="https://github.com/meizjm3i/Meizj" target="_blank" rel="noopener">Github链接</a>这里点个star。Readme目前还不完善，这个主题后续还想完成的部分有：</p>
+<ol>
+<li>移动端自适应</li>
+<li>图片懒加载</li>
+<li>图片放大查看</li>
+</ol>
+<p>慢慢改吧～</p>
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
+$('pre').addClass('prettyprint linenums');
+prettyPrint();
+//- });
+$(".gutter").remove();</script></body></html>

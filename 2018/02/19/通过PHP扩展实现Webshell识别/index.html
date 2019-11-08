@@ -66,7 +66,7 @@ opcode如下:</p>
 <p>我们现在大概理清楚了使用PHP编写的Webshell执行的大概流程，剩下的要做就是在eval此类危险函数即将调用时，将之hook掉。</p>
 <p>最后给出eval函数的实现，大家可以想一下如何去hook住eval，实现代码EVAL在Zend/zend_vm_def.h:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> *eval_desc = zend_make_compiled_string_description(<span class="string">"eval()'d code"</span> TSRMLS_CC);</span><br><span class="line">new_op_array = zend_compile_string(inc_filename, eval_desc TSRMLS_CC);</span><br><span class="line">efree(eval_desc);</span><br></pre></td></tr></table></figure>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
+</article><div id="paginator"></div><div id="toc"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script src="/js/meizj.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
 //- });

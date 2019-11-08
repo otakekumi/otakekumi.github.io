@@ -43,7 +43,7 @@
 <p>4.在接下来的代码中，多次启动名为apache的程序，与top命令查看结果一致，至此，基本确定anncron文件就是不断生成cron下root文件，以及重复执行根目录下. d41d8cd98f00b204e9800998ecf8427e文件的源头。</p>
 <p>删除anacron文件，观察发现apache不再启动，补上redis的漏洞，修复完成。</p>
 <p>总结：大概流程是，攻击者利用redis漏洞，免密码ssh连接，然后下载文件，并将该文件保存为anacron文件，后面的定时也是从该文件衍生，挖矿程序至apache后不再更名的原因可能是，，攻击者无法ssh连接，只能运行最后一次下载的文件，之前删除的都是衍生物，并未删除根源，所以会重生，删除根源文件即可。</p>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
+</article><div id="paginator"></div><div id="toc"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script src="/js/meizj.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
 //- });

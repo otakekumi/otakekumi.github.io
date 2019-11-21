@@ -45,8 +45,8 @@
 
 #post{
   position: relative;
-  left:25%;
-  padding-top:5%;
+  left: 50%;
+  top: 50%;
 
 }
 #datetime{

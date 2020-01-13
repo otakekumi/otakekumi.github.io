@@ -10,14 +10,17 @@ function showArticleIndex() {
     console.log(labelList.length);
 
     for(var i=0;i<labelList.length;i++){
-        if($(labelList[i]).is("h1")){
-            h2List = new Array();
-            h1List.push({
-                node:$(labelList[i]),
-                id:i,
-                children:h2List
-            })
+        if(i!=0){
+            if($(labelList[i]).is("h1")){
+                h2List = new Array();
+                h1List.push({
+                    node:$(labelList[i]),
+                    id:i,
+                    children:h2List
+                })
+            }
         }
+        
 
         if($(labelList[i]).is("h2")){
             h3List = new Array();

@@ -14,15 +14,18 @@
 
 #blogTitle{
   position: relative;
-  left:30%;
+  left:40%;
   font-size:2rem;
+  font-family: Baskerville,Georgia,"Liberation Serif",Kaiti SC,STKaiti,AR PL UKai CN,AR PL UKai HK,AR PL UKai TW,AR PL UKai TW MBE,AR PL KaitiM GB,KaiTi,KaiTi_GB2312,DFKai-SB,TW\\-Kai,serif;
+
 }
 
 .recent-post-item{
   position: relative;
-  left:30%;
+  left:40%;
   margin:30px auto;
   font-size:1.4em;
+  font-family: Baskerville,Georgia,"Liberation Serif",Kaiti SC,STKaiti,AR PL UKai CN,AR PL UKai HK,AR PL UKai TW,AR PL UKai TW MBE,AR PL KaitiM GB,KaiTi,KaiTi_GB2312,DFKai-SB,TW\\-Kai,serif;
 }
 
 
@@ -41,6 +44,10 @@
   position: relative;
   left:30%;
   width:50%;
+}
+
+article p {
+  font-size: 18px;
 }
 
 #post{
@@ -78,8 +85,7 @@
   width:860px;
   left:10%;
   padding:65px 0 25px;
-  /* font-family: Palatino, Optima, Georgia, serif; */
-  font-family: Baskerville,Georgia,"Liberation Serif",Kaiti SC,STKaiti,AR PL UKai CN,AR PL UKai HK,AR PL UKai TW,AR PL UKai TW MBE,AR PL KaitiM GB,KaiTi,KaiTi_GB2312,DFKai-SB,TW\\-Kai,serif;
+  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 }
 
 #postTitle{

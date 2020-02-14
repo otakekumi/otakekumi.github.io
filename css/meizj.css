@@ -85,7 +85,7 @@ article p {
   width:860px;
   left:10%;
   padding:65px 0 25px;
-  font-family: "lucida grande", "lucida sans unicode", lucida, helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
+  font: 400 16px/1 "Open Sans","Hiragino Sans GB",sans-serif;
 }
 
 #postTitle{
@@ -105,13 +105,13 @@ article p {
 
 #footer {
   color: gray;
-  font-size: 1.4em;
+  font-size: 18px;
   text-align: center;
-  margin-top: 20px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  line-height: 34px;
+  padding: 25px 0;
+
   border-top: 1px solid rgba(0,0,0,0.1);
-  font:400 18px/1.62 "Georgia","Xin Gothic","Hiragino Sans GB","Droid Sans Fallback","Microsoft YaHei",sans-serif;
+  font:400 18px/1 "Open Sans","Hiragino Sans GB",sans-serif;
 }
 #toc{
   list-style-type:none;
@@ -140,4 +140,14 @@ article p {
   -moz-transition: 0.1s;
   -ms-transition: 0.1s;
   -o-transition: 0.1s;
+}
+
+#bar{
+  text-decoration:none;
+  color: #39393C;
+  font: 400 18px/1 "Open Sans","Hiragino Sans GB",sans-serif;
+}
+
+article a{
+  color: #026ed2;
 }

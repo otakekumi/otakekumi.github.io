@@ -46,9 +46,9 @@ function showArticleIndex() {
         tocList.forEach(function(toc){
             toc.node.before('<span class="anchor" id="_label'+toc.id+'"></span>');
             if(toc.children == 0){
-                content += '<li><a href="#_label'+toc.id+'">'+toc.node.text()+'</a></li>';
+                content += '<li><a class="bar" href="#_label'+toc.id+'">'+toc.node.text()+'</a></li>';
             }else {
-                content += '<li><a href="#_label'+toc.id+'">'+toc.node.text()+'</a>'+show(toc.children)+'</li>';
+                content += '<li><a class="bar" href="#_label'+toc.id+'">'+toc.node.text()+'</a>'+show(toc.children)+'</li>';
             }
         })
 

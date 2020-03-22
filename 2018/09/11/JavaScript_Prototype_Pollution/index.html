@@ -1,8 +1,189 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>JavaScript原型链污染 [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><link rel="stylesheet" href="/css/screen.css"><link rel="stylesheet" href="/css/tag.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+<!DOCTYPE html>
+
+
+  <html class="dark page-post">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>JavaScript原型链污染 | 梅子酒の笔记本</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript">
+  
+
+  <meta name="description" content="原型对象及相关基础 在JavaScript中只有一种结构:对象,也就是常说的&amp;quot;万物皆对象&amp;quot;。 而每个实例对象都有一个原型对象,而原型对象则引申出其对应的原型对象,经过一层层的链式调用,就构成了我们常说的&amp;quot;原型链&amp;quot;。 实例对象可以通过__proto__访问其原型对象: 1234&amp;gt;  let obj = &amp;#123;&amp;#125;;&amp;lt;· undefi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript原型链污染">
+<meta property="og:url" content="https://meizjm3i.github.io/2018/09/11/JavaScript_Prototype_Pollution/index.html">
+<meta property="og:site_name" content="梅子酒の笔记本">
+<meta property="og:description" content="原型对象及相关基础 在JavaScript中只有一种结构:对象,也就是常说的&amp;quot;万物皆对象&amp;quot;。 而每个实例对象都有一个原型对象,而原型对象则引申出其对应的原型对象,经过一层层的链式调用,就构成了我们常说的&amp;quot;原型链&amp;quot;。 实例对象可以通过__proto__访问其原型对象: 1234&amp;gt;  let obj = &amp;#123;&amp;#125;;&amp;lt;· undefi">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-17T07:34:43.926Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript原型链污染">
+<meta name="twitter:description" content="原型对象及相关基础 在JavaScript中只有一种结构:对象,也就是常说的&amp;quot;万物皆对象&amp;quot;。 而每个实例对象都有一个原型对象,而原型对象则引申出其对应的原型对象,经过一层层的链式调用,就构成了我们常说的&amp;quot;原型链&amp;quot;。 实例对象可以通过__proto__访问其原型对象: 1234&amp;gt;  let obj = &amp;#123;&amp;#125;;&amp;lt;· undefi">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-38189205-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
 
 
 
-</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">JavaScript原型链污染</h1><h1 id="原型对象及相关基础"><a class="markdownIt-Anchor" href="#原型对象及相关基础"></a> 原型对象及相关基础</h1>
+  
+
+</head>
+</html>
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header LEFT">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post LEFT">
+   <article id="post-JavaScript_Prototype_Pollution" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">JavaScript原型链污染</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2018.09.11</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Meizj</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/技术/">技术</a>
+  </span>
+
+
+
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="原型对象及相关基础"><a class="markdownIt-Anchor" href="#原型对象及相关基础"></a> 原型对象及相关基础</h1>
 <p>在JavaScript中只有一种结构:对象,也就是常说的&quot;万物皆对象&quot;。</p>
 <p>而每个实例对象都有一个原型对象,而原型对象则引申出其对应的原型对象,经过一层层的链式调用,就构成了我们常说的&quot;原型链&quot;。</p>
 <p>实例对象可以通过<code>__proto__</code>访问其原型对象:</p>
@@ -32,8 +213,129 @@
 <p>在控制台演示原型链污染如下:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt;  a=[];</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  b=[];</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  b[&quot;__proto__&quot;];</span><br><span class="line">&lt;· [constructor: ƒ, concat: ƒ, find: ƒ, findIndex: ƒ, pop: ƒ, …]</span><br><span class="line">&gt;  b[&quot;__proto__&quot;][&quot;admintoken&quot;]=&quot;ccda&quot;;</span><br><span class="line">&lt;· &quot;ccda&quot;</span><br><span class="line">&gt;  a</span><br><span class="line">&lt;· []</span><br><span class="line">&gt;  a.admintoken</span><br><span class="line">&lt;· &quot;ccda&quot;</span><br></pre></td></tr></table></figure>
 <p>因此我们传入的payload就可以构造出来了。</p>
-</article><div id="paginator"></div><div id="toc"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script src="/js/meizj.js"></script><script>//- $(window).on('load', function(){ 
-$('pre').addClass('prettyprint linenums');
-prettyPrint();
-//- });
-$(".gutter").remove();</script></body></html>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,8 +1,189 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>LCTF Padding Oracle Attack Writeup [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><link rel="stylesheet" href="/css/screen.css"><link rel="stylesheet" href="/css/tag.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+<!DOCTYPE html>
+
+
+  <html class="dark page-post">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>LCTF Padding Oracle Attack Writeup | 梅子酒の笔记本</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript">
+  
+
+  <meta name="description" content="源码 扫到.login.php.swp，还原之后为： 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576&amp;lt;?phperror_reporting(0);se">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LCTF Padding Oracle Attack Writeup">
+<meta property="og:url" content="https://meizjm3i.github.io/2017/11/28/ LCTF Padding Oracle Attack Writeup/index.html">
+<meta property="og:site_name" content="梅子酒の笔记本">
+<meta property="og:description" content="源码 扫到.login.php.swp，还原之后为： 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576&amp;lt;?phperror_reporting(0);se">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-01-17T07:33:09.526Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LCTF Padding Oracle Attack Writeup">
+<meta name="twitter:description" content="源码 扫到.login.php.swp，还原之后为： 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576&amp;lt;?phperror_reporting(0);se">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-38189205-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
 
 
 
-</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">LCTF Padding Oracle Attack Writeup</h1><h1 id="源码"><a class="markdownIt-Anchor" href="#源码"></a> 源码</h1>
+  
+
+</head>
+</html>
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header LEFT">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post LEFT">
+   <article id="post- LCTF Padding Oracle Attack Writeup" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">LCTF Padding Oracle Attack Writeup</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.11.28</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Meizj</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/技术/">技术</a>
+  </span>
+
+
+
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="源码"><a class="markdownIt-Anchor" href="#源码"></a> 源码</h1>
 <p>扫到.login.php.swp，还原之后为：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">error_reporting(<span class="number">0</span>);</span><br><span class="line">session_start();</span><br><span class="line">define(<span class="string">"METHOD"</span>, <span class="string">"aes-128-cbc"</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">'config.php'</span>);</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">show_page</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="string">&lt;html&gt;</span></span><br><span class="line"><span class="string">&lt;head&gt;</span></span><br><span class="line"><span class="string">  &lt;meta charset="UTF-8"&gt;</span></span><br><span class="line"><span class="string">  &lt;title&gt;Login Form&lt;/title&gt;</span></span><br><span class="line"><span class="string">  &lt;link rel="stylesheet" type="text/css" href="css/login.css" /&gt;</span></span><br><span class="line"><span class="string">&lt;/head&gt;</span></span><br><span class="line"><span class="string">&lt;body&gt;</span></span><br><span class="line"><span class="string">  &lt;div class="login"&gt;</span></span><br><span class="line"><span class="string">&lt;/h1&gt;</span></span><br><span class="line"><span class="string">    &lt;h1&gt;</span></span><br><span class="line"><span class="string">    &lt;form method="post"&gt;</span></span><br><span class="line"><span class="string">        &lt;input type="text" name="username" placeholder="Username" required="required" /&gt;</span></span><br><span class="line"><span class="string">        &lt;input type="password" name="password" placeholder="Password" required="required" /&gt;</span></span><br><span class="line"><span class="string">        &lt;button type="submit" class="btn btn-primary btn-block btn-large"&gt;Login&lt;/button&gt;</span></span><br><span class="line"><span class="string">    &lt;/form&gt;</span></span><br><span class="line"><span class="string">&lt;/div&gt;</span></span><br><span class="line"><span class="string">&lt;/body&gt;</span></span><br><span class="line"><span class="string">&lt;/html&gt;'</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">get_random_token</span><span class="params">()</span></span>&#123;</span><br><span class="line">    $random_token = <span class="string">''</span>;</span><br><span class="line">    $str = <span class="string">"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"</span>;</span><br><span class="line">    <span class="keyword">for</span>($i = <span class="number">0</span>; $i &lt; <span class="number">16</span>; $i++)&#123;</span><br><span class="line">        $random_token .= substr($str, rand(<span class="number">1</span>, <span class="number">61</span>), <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> $random_token;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">get_identity</span><span class="params">()</span></span>&#123;</span><br><span class="line">	<span class="keyword">global</span> $id;</span><br><span class="line">    $token = get_random_token();</span><br><span class="line">    $c = openssl_encrypt($id, METHOD, SECRET_KEY, OPENSSL_RAW_DATA, $token);</span><br><span class="line">    $_SESSION[<span class="string">'id'</span>] = base64_encode($c);</span><br><span class="line">    setcookie(<span class="string">"token"</span>, base64_encode($token));</span><br><span class="line">    <span class="keyword">if</span>($id === <span class="string">'admin'</span>)&#123;</span><br><span class="line">    	$_SESSION[<span class="string">'isadmin'</span>] = <span class="number">1</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    	$_SESSION[<span class="string">'isadmin'</span>] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test_identity</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">isset</span>($_SESSION[<span class="string">'id'</span>])) &#123;</span><br><span class="line">        $c = base64_decode($_SESSION[<span class="string">'id'</span>]);</span><br><span class="line">        $token = base64_decode($_COOKIE[<span class="string">"token"</span>]);</span><br><span class="line">        <span class="keyword">if</span>($u = openssl_decrypt($c, METHOD, SECRET_KEY, OPENSSL_RAW_DATA, $token))&#123;</span><br><span class="line">            <span class="keyword">if</span> ($u === <span class="string">'admin'</span>) &#123;</span><br><span class="line">                $_SESSION[<span class="string">'isadmin'</span>] = <span class="number">1</span>;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">die</span>(<span class="string">"Error!"</span>);</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;&#125;</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_POST[<span class="string">'username'</span>])&amp;&amp;<span class="keyword">isset</span>($_POST[<span class="string">'password'</span>]))&#123;</span><br><span class="line">	$username = mysql_real_escape_string($_POST[<span class="string">'username'</span>]);</span><br><span class="line">	$password = $_POST[<span class="string">'password'</span>];</span><br><span class="line">	$result = mysql_query(<span class="string">"select password from users where username='"</span> . $username . <span class="string">"'"</span>, $con);</span><br><span class="line">	$row = mysql_fetch_array($result);</span><br><span class="line">	<span class="keyword">if</span>($row[<span class="string">'password'</span>] === md5($password))&#123;</span><br><span class="line">  		get_identity();</span><br><span class="line">  		header(<span class="string">'location: ./admin.php'</span>);</span><br><span class="line">  	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">  		<span class="keyword">die</span>(<span class="string">'Login failed.'</span>);</span><br><span class="line">  	&#125;</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(test_identity())&#123;</span><br><span class="line">        header(<span class="string">'location: ./admin.php'</span>);</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        show_page();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 <p>仔细看过之后，发现只能从加密算法这边怼，就想到了Padding Oracle Attack，在这里我的目的就是将$_SESSION[‘admin’]改为admin</p>
@@ -15,8 +196,129 @@
 <p>接下来是一个格式化串SQL注入，源码如下：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">error_reporting(<span class="number">0</span>);</span><br><span class="line">session_start();</span><br><span class="line"><span class="keyword">include</span>(<span class="string">'config.php'</span>);</span><br><span class="line"><span class="keyword">if</span>(!$_SESSION[<span class="string">'isadmin'</span>])&#123;</span><br><span class="line">	<span class="keyword">die</span>(<span class="string">'You are not admin'</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">'id'</span>]))&#123;</span><br><span class="line">	$id = mysql_real_escape_string($_GET[<span class="string">'id'</span>]);</span><br><span class="line">	<span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">'title'</span>]))&#123;</span><br><span class="line">		$title = mysql_real_escape_string($_GET[<span class="string">'title'</span>]);</span><br><span class="line">		$title = sprintf(<span class="string">"AND title='%s'"</span>, $title);</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		$title = <span class="string">''</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	$sql = sprintf(<span class="string">"SELECT * FROM article WHERE id='%s' $title"</span>, $id);</span><br><span class="line">	$result = mysql_query($sql,$con);</span><br><span class="line">	$row = mysql_fetch_array($result);</span><br><span class="line">	<span class="keyword">if</span>(<span class="keyword">isset</span>($row[<span class="string">'title'</span>])&amp;&amp;<span class="keyword">isset</span>($row[<span class="string">'content'</span>]))&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">"&lt;h1&gt;"</span>.$row[<span class="string">'title'</span>].<span class="string">"&lt;/h1&gt;&lt;br&gt;"</span>.$row[<span class="string">'content'</span>];</span><br><span class="line">		<span class="keyword">die</span>();</span><br><span class="line">	&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">		<span class="keyword">die</span>(<span class="string">"This article does not exist."</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 <p>很简单的格式化字符串漏洞，title=%1$’  xxxx  这种模式字符串即可。</p>
-</article><div id="paginator"></div><div id="toc"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script src="/js/meizj.js"></script><script>//- $(window).on('load', function(){ 
-$('pre').addClass('prettyprint linenums');
-prettyPrint();
-//- });
-$(".gutter").remove();</script></body></html>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

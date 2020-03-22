@@ -46,16 +46,13 @@
   width:50%;
 }
 
-article p {
-  font-size: 18px;
-}
-
 #post{
-  position: relative;
+  position: absolute;
+  width: 1000px;
+  font-size: 18px;
   left: 50%;
-  top: 50%;
-
 }
+
 #datetime{
   font-style: italic;
   font-size: 1em;
@@ -83,7 +80,6 @@ article p {
   position: relative;
   color: #39393C;
   width:860px;
-  left:10%;
   padding:65px 0 25px;
   font: 400 16px/1 "Open Sans","Hiragino Sans GB",sans-serif;
 }
@@ -108,8 +104,8 @@ article p {
   font-size: 18px;
   text-align: center;
   line-height: 34px;
-  padding: 25px 0;
-
+  position: fixed;
+  bottom: 0px;
   border-top: 1px solid rgba(0,0,0,0.1);
   font:400 18px/1 "Open Sans","Hiragino Sans GB",sans-serif;
 }
@@ -148,6 +144,6 @@ article p {
   font: 400 18px/1 "Open Sans","Hiragino Sans GB",sans-serif;
 }
 
-article a{
+#post a{
   color: #026ed2;
 }

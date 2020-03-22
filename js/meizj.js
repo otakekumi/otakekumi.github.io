@@ -5,7 +5,7 @@ $(document).ready(function () {
 
 function showArticleIndex() {
     var h1List = h2List = h3List = [];
-    var labelList = $("article").children();
+    var labelList = $("#post").children();
 
     console.log(labelList.length);
 

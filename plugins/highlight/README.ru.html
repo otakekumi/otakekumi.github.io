@@ -5,19 +5,19 @@
 <h2 id="начало-работы"><a class="markdownIt-Anchor" href="#начало-работы"></a> Начало работы</h2>
 <p>Минимум, что нужно сделать для использования highlight.js на веб-странице — это<br />
 подключить библиотеку, CSS-стили и вызывать <a href="http://highlightjs.readthedocs.io/en/latest/api.html#inithighlightingonload"><code>initHighlightingOnLoad</code></a>:</p>
-<pre class="highlight"><code class="html"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"/path/to/styles/default.css"</span>&gt;</span>
-<span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"/path/to/highlight.pack.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>
-<span class="tag">&lt;<span class="name">script</span>&gt;</span>hljs.initHighlightingOnLoad();<span class="tag">&lt;/<span class="name">script</span>&gt;</span>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"/path/to/styles/default.css"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"/path/to/highlight.pack.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span>hljs.initHighlightingOnLoad();<span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 <p>Библиотека найдёт и раскрасит код внутри тегов <code>&lt;pre&gt;&lt;code&gt;</code>, попытавшись<br />
 автоматически определить язык. Когда автоопределение не срабатывает, можно явно<br />
 указать язык в атрибуте class:</p>
-<pre class="highlight"><code class="html"><span class="tag">&lt;<span class="name">pre</span>&gt;</span><span class="tag">&lt;<span class="name">code</span> <span class="attr">class</span>=<span class="string">"html"</span>&gt;</span>...<span class="tag">&lt;/<span class="name">code</span>&gt;</span><span class="tag">&lt;/<span class="name">pre</span>&gt;</span>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">code</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"html"</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">code</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
 </code></pre>
 <p>Список поддерживаемых классов языков доступен в <a href="http://highlightjs.readthedocs.io/en/latest/css-classes-reference.html">справочнике по классам</a>.<br />
 Класс также можно предварить префиксами <code>language-</code> или <code>lang-</code>.</p>
 <p>Чтобы отключить подсветку для какого-то блока, используйте класс <code>nohighlight</code>:</p>
-<pre class="highlight"><code class="html"><span class="tag">&lt;<span class="name">pre</span>&gt;</span><span class="tag">&lt;<span class="name">code</span> <span class="attr">class</span>=<span class="string">"nohighlight"</span>&gt;</span>...<span class="tag">&lt;/<span class="name">code</span>&gt;</span><span class="tag">&lt;/<span class="name">pre</span>&gt;</span>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">code</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"nohighlight"</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">code</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span>
 </code></pre>
 <h2 id="инициализация-вручную"><a class="markdownIt-Anchor" href="#инициализация-вручную"></a> Инициализация вручную</h2>
 <p>Чтобы иметь чуть больше контроля за инициализацией подсветки, вы можете<br />
@@ -25,8 +25,8 @@
 можно управлять тем, <em>что</em> и <em>когда</em> подсвечивать.</p>
 <p>Вот пример инициализации, эквивалентной вызову <a href="http://highlightjs.readthedocs.io/en/latest/api.html#inithighlightingonload"><code>initHighlightingOnLoad</code></a>, но<br />
 с использованием <code>document.addEventListener</code>:</p>
-<pre class="highlight"><code class="js"><span class="built_in">document</span>.addEventListener(<span class="string">'DOMContentLoaded'</span>, (event) =&gt; {
-  <span class="built_in">document</span>.querySelectorAll(<span class="string">'pre code'</span>).forEach(<span class="function">(<span class="params">block</span>) =&gt;</span> {
+<pre class="highlight"><code class="js"><span class="hljs-built_in">document</span>.addEventListener(<span class="hljs-string">'DOMContentLoaded'</span>, (event) =&gt; {
+  <span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">'pre code'</span>).forEach(<span class="hljs-function">(<span class="hljs-params">block</span>) =&gt;</span> {
     hljs.highlightBlock(block);
   });
 });
@@ -34,9 +34,9 @@
 <p>Вы можете использовать любые теги разметки вместо <code>&lt;pre&gt;&lt;code&gt;</code>. Если<br />
 используете контейнер, не сохраняющий переводы строк, вам нужно сказать<br />
 highlight.js использовать для них тег <code>&lt;br&gt;</code>:</p>
-<pre class="highlight"><code class="js">hljs.configure({<span class="attr">useBR</span>: <span class="literal">true</span>});
+<pre class="highlight"><code class="js">hljs.configure({<span class="hljs-attr">useBR</span>: <span class="hljs-literal">true</span>});
 
-<span class="built_in">document</span>.querySelectorAll(<span class="string">'div.code'</span>).forEach(<span class="function">(<span class="params">block</span>) =&gt;</span> {
+<span class="hljs-built_in">document</span>.querySelectorAll(<span class="hljs-string">'div.code'</span>).forEach(<span class="hljs-function">(<span class="hljs-params">block</span>) =&gt;</span> {
   hljs.highlightBlock(block);
 });
 </code></pre>
@@ -45,17 +45,17 @@ highlight.js использовать для них тег <code>&lt;br&gt;</cod
 <p>Подсветку можно запустить внутри web worker’а, чтобы окно<br />
 браузера не подтормаживало при работе с большими кусками кода.</p>
 <p>В основном скрипте:</p>
-<pre class="highlight"><code class="js">addEventListener(<span class="string">'load'</span>, () =&gt; {
-  <span class="keyword">const</span> code = <span class="built_in">document</span>.querySelector(<span class="string">'#code'</span>);
-  <span class="keyword">const</span> worker = <span class="keyword">new</span> Worker(<span class="string">'worker.js'</span>);
-  worker.onmessage = <span class="function">(<span class="params">event</span>) =&gt;</span> { code.innerHTML = event.data; }
+<pre class="highlight"><code class="js">addEventListener(<span class="hljs-string">'load'</span>, () =&gt; {
+  <span class="hljs-keyword">const</span> code = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'#code'</span>);
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> Worker(<span class="hljs-string">'worker.js'</span>);
+  worker.onmessage = <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> { code.innerHTML = event.data; }
   worker.postMessage(code.textContent);
 });
 </code></pre>
 <p>В worker.js:</p>
-<pre class="highlight"><code class="js">onmessage = <span class="function">(<span class="params">event</span>) =&gt;</span> {
-  importScripts(<span class="string">'&lt;path&gt;/highlight.pack.js'</span>);
-  <span class="keyword">const</span> result = self.hljs.highlightAuto(event.data);
+<pre class="highlight"><code class="js">onmessage = <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
+  importScripts(<span class="hljs-string">'&lt;path&gt;/highlight.pack.js'</span>);
+  <span class="hljs-keyword">const</span> result = self.hljs.highlightAuto(event.data);
   postMessage(result.value);
 };
 </code></pre>
@@ -69,7 +69,7 @@ highlight.js использовать для них тег <code>&lt;br&gt;</cod
 <p><strong>Файл на CDN содержит не все языки.</strong> Иначе он будет слишком большого размера.<br />
 Если нужного вам языка нет в <a href="https://highlightjs.org/download/">категории “Common”</a>, можно дообавить его<br />
 вручную:</p>
-<pre class="highlight"><code class="html"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/languages/go.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>
+<pre class="highlight"><code class="html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/languages/go.min.js"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
 </code></pre>
 <p><strong>Про Almond.</strong> Нужно задать имя модуля в оптимизаторе, например:</p>
 <pre class="highlight"><code class="">r.js -o name=hljs paths.hljs=/path/to/highlight out=highlight.js

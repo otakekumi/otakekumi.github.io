@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+
+  <html class="dark page-post">
+
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>PHP短标签的解析生效问题 | 梅子酒の笔记本</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="forsigner,前端,设计,Hexo主题,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript">
+  
+
+  <meta name="description" content="问题摘要 在Cybrics2020的一个题目中，题目已经设置了short_open_tag = Off，但是在代码中仍然使用了&amp;lt;?=....的形式，原来的猜想是docker部署的时候由于某些原因使该配置项没有生效，从而导致短标签能继续使用，并且PHP Manual中的描述也佐证了这个猜想，其中对于short_open_tag的描述中有如下一段：  本指令也会影响到缩写形式 &amp;lt;?=，它">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP短标签的解析生效问题">
+<meta property="og:url" content="https://meizjm3i.github.io/2020/07/26/PHP短标签的解析生效问题/index.html">
+<meta property="og:site_name" content="梅子酒の笔记本">
+<meta property="og:description" content="问题摘要 在Cybrics2020的一个题目中，题目已经设置了short_open_tag = Off，但是在代码中仍然使用了&amp;lt;?=....的形式，原来的猜想是docker部署的时候由于某些原因使该配置项没有生效，从而导致短标签能继续使用，并且PHP Manual中的描述也佐证了这个猜想，其中对于short_open_tag的描述中有如下一段：  本指令也会影响到缩写形式 &amp;lt;?=，它">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-07-26T18:08:48.803Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP短标签的解析生效问题">
+<meta name="twitter:description" content="问题摘要 在Cybrics2020的一个题目中，题目已经设置了short_open_tag = Off，但是在代码中仍然使用了&amp;lt;?=....的形式，原来的猜想是docker部署的时候由于某些原因使该配置项没有生效，从而导致短标签能继续使用，并且PHP Manual中的描述也佐证了这个猜想，其中对于short_open_tag的描述中有如下一段：  本指令也会影响到缩写形式 &amp;lt;?=，它">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    <link rel="stylesheet" href="/css/personal-style.css">
+  
+
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-38189205-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?57e94d016e201fba3603a8a2b0263af0";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+	(function(){
+	    var bp = document.createElement('script');
+	    var curProtocol = window.location.protocol.split(':')[0];
+	    if (curProtocol === 'https') {
+	        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+	    }
+	    else {
+	        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+	    }
+	    var s = document.getElementsByTagName("script")[0];
+	    s.parentNode.insertBefore(bp, s);
+	})();
+  </script>
+
+
+
+  
+
+</head>
+</html>
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header LEFT">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/atom.xml"
+            rel="noopener noreferrer"
+            target="_blank"
+            >
+            RSS
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+
+
+<div class="content content-post LEFT">
+   <article id="post-PHP短标签的解析生效问题" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">PHP短标签的解析生效问题</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2020.07.26</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>Meizj</span>
+        </span>
+      
+
+      
+
+
+      
+
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="问题摘要"><a class="markdownIt-Anchor" href="#问题摘要"></a> 问题摘要</h1>
+<p>在Cybrics2020的一个题目中，题目已经设置了<code>short_open_tag = Off</code>，但是在代码中仍然使用了<code>&lt;?=....</code>的形式，原来的猜想是docker部署的时候由于某些原因使该配置项没有生效，从而导致短标签能继续使用，并且PHP Manual中的描述也佐证了这个猜想，其中对于<code>short_open_tag</code>的描述中有如下一段：</p>
+<blockquote>
+<p>本指令也会影响到缩写形式 &lt;?=，它和 &lt;? echo 等价。使用此缩写需要 short_open_tag 的值为 On。 从 PHP 5.4.0 起， &lt;?= 总是可用的。</p>
+</blockquote>
+<p>最初我和队友将<code>从 PHP 5.4.0 起， &lt;?= 总是可用的</code>理解为了在PHP5.4.0之后默认生效，但可以通过设置<code>short_open_tag = Off</code>来进行关闭。但是随后@Smile在PHP7.4.1下的测试推翻了这个认识：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1.php</span></span><br><span class="line"><span class="meta">&lt;?</span>=phpinfo();<span class="meta">?&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.php</span></span><br><span class="line"><span class="meta">&lt;?</span> phpinfo();<span class="meta">?&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 已设置 short_open_tag = Off</span></span><br></pre></td></tr></table></figure>
+<p>实际运行时却发现1.php的代码能够正常执行，2.php的内容不执行，因此这就和<code>可以通过关闭short_open_tag来使&lt;?=失效</code>这个结论冲突了。后面我在PHP5.6.31下测试，效果同PHP7.4.1，排除了PHP7和PHP5大版本差异导致的解析不一致。</p>
+<h1 id="php代码解析过程"><a class="markdownIt-Anchor" href="#php代码解析过程"></a> PHP代码解析过程</h1>
+<p>PHP的代码在真正执行会经过一长串的处理，其中和代码解析相关的部分则是Zend引擎对代码进行词法、语法分析，编译为opcode执行。</p>
+<p>在进行词法、语法分析时，PHP会按照已规定好的词法规则将代码切分为单独的Token，然后再通过bison进行语法处理，当语法出现错误时则会终止执行，也就是我们所看到的各种语法错误提示。</p>
+<p>与词法、语法分析相关的规则主要存放在<code>Zend/zend_language_parser.y</code>以及<code>zend_language_scanner.l</code>两个文件中，我们着重关注<code>&lt;?=</code>与<code>&lt;?</code>，其中，在<code>Zend/zend_language_parser.y</code>文件中，对<code>&lt;?=</code>进行了定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%token T_OPEN_TAG_WITH_ECHO <span class="string">"'&lt;?='"</span></span><br></pre></td></tr></table></figure>
+<p>在<code>zend_language_scanner.l</code>中则定义了相关的re2c规则，<code>&lt;?=</code>与<code>&lt;?</code>与<code>&lt;?php</code>一样，都可以作为PHP代码的起始符：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;INITIAL&gt;<span class="string">"&lt;?="</span> &#123;</span><br><span class="line">	BEGIN(ST_IN_SCRIPTING);</span><br><span class="line">	<span class="keyword">if</span> (PARSER_MODE()) &#123;</span><br><span class="line">		<span class="comment">/* We'll reject this as an identifier in zend_lex_tstring. */</span></span><br><span class="line">		RETURN_TOKEN_WITH_IDENT(T_ECHO);</span><br><span class="line">	&#125;</span><br><span class="line">	RETURN_TOKEN(T_OPEN_TAG_WITH_ECHO);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;INITIAL&gt;<span class="string">"&lt;?"</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> (CG(short_tags)) &#123;</span><br><span class="line">		BEGIN(ST_IN_SCRIPTING);</span><br><span class="line">		RETURN_OR_SKIP_TOKEN(T_OPEN_TAG);</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">goto</span> inline_char_handler;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="的解析"><a class="markdownIt-Anchor" href="#的解析"></a> &lt;?= 的解析</h1>
+<p>为了理解其差异，我们先看<code>&lt;?=</code>的处理流程，它的处理流程主要涉及<code>PARSER_MODE</code>、<code>RETURN_TOKEN_WITH_IDENT</code>、<code>RETURN_TOKEN</code>三个方法，其定义分别为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PARSER_MODE() \</span></span><br><span class="line">	EXPECTED(elem != <span class="literal">NULL</span>)</span><br><span class="line">	</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RETURN_TOKEN_WITH_IDENT(_token) do &#123; \</span></span><br><span class="line">		token = _token; \</span><br><span class="line">		<span class="keyword">goto</span> emit_token_with_ident; \</span><br><span class="line">	&#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br><span class="line">	</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RETURN_TOKEN(_token) do &#123; \</span></span><br><span class="line">		token = _token; \</span><br><span class="line">		<span class="keyword">goto</span> emit_token; \</span><br><span class="line">	&#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p><code>PARSER_MODE</code>会判断是否elem是否为空，elem是个union结构：<code>zend_parser_stack_elem</code>，主要用于表示词法元素，其定义为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">union</span> _zend_parser_stack_elem &#123;</span><br><span class="line">	zend_ast *ast;</span><br><span class="line">	zend_string *str;</span><br><span class="line">	zend_ulong num;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">char</span> *ptr;</span><br><span class="line">	zend_lexer_ident_ref ident;</span><br><span class="line">&#125; zend_parser_stack_elem;</span><br></pre></td></tr></table></figure>
+<p>因此<code>PARSER_MODE</code>主要作用为判断当前是否有词法元素需要解析。<code>RETURN_TOKEN_WITH_IDENT</code>与<code>RETURN_TOKEN</code>的实现较为相似，都是一个goto语句，对应的代码块为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">emit_token:</span><br><span class="line">	<span class="keyword">if</span> (SCNG(on_event)) &#123;</span><br><span class="line">		SCNG(on_event)(ON_TOKEN, token, start_line, yytext, yyleng, SCNG(on_event_context));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> token;</span><br><span class="line">	</span><br><span class="line">emit_token_with_ident:</span><br><span class="line">	<span class="keyword">if</span> (PARSER_MODE()) &#123;</span><br><span class="line">		elem-&gt;ident.offset = SCNG(yy_text) - SCNG(yy_start);</span><br><span class="line">		elem-&gt;ident.len = SCNG(yy_leng);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (SCNG(on_event)) &#123;</span><br><span class="line">		SCNG(on_event)(ON_TOKEN, token, start_line, yytext, yyleng, SCNG(on_event_context));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> token;</span><br></pre></td></tr></table></figure>
+<p>SCNG宏可以对定义的scanner_global全局变量进行取值，scanner_global主要用于存放lexer的状态信息，比如当前处理的指针位置、最后一次处理的token位置等，在上面的<code>elem-&gt;ident.offset = SCNG(yy_text) - SCNG(yy_start);</code>这一句中，便是计算当前位置和开始位置从而得出偏移量。</p>
+<p><code>SCNG(on_event)</code>则是取出存放在on_event上的同名函数，on_event可以根据token类型进行对应的处理，函数参数类型为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">on_event(zend_php_scanner_event event, <span class="keyword">int</span> token, <span class="keyword">int</span> line,<span class="keyword">const</span> <span class="keyword">char</span> *text, <span class="keyword">size_t</span> length, <span class="keyword">void</span> *context)</span><br></pre></td></tr></table></figure>
+<p>对于分析<code>&lt;?=</code>做了什么这个问题来说，分析到这里基本结束了，因此可以得出结论，对于<code>&lt;?=</code>来说，在解析完了echo就会继续后续token的处理，且未看到对于短标签配置的取值判断。</p>
+<h1 id="的解析-2"><a class="markdownIt-Anchor" href="#的解析-2"></a> &lt;? 的解析</h1>
+<p><code>&lt;?</code>与<code>&lt;?=</code>最关键的区别就在于<code>CG(short_tags)</code>的判断上，CG宏含义为Compiler Globals，与Zend编译器相关的全局变量相关，<code>CG(short_tags)</code>则是取出有关于短标签的配置，随后根据取值来决定是否继续后续的代码执行。<code>inline_char_handler</code>用于扫描不在PHP标签中的内容，因此以<code>&lt;?</code>表示的PHP代码也就不会进行执行。</p>
+<p>上述代码的分析在PHP7.4.9下进行，在PHP5.6.31版本下的分析要更为简单，对<code>&lt;?=</code>的写法更为直观：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;INITIAL&gt;<span class="string">"&lt;?="</span> &#123;</span><br><span class="line">	ZVAL_STRINGL(zendlval, yytext, yyleng, <span class="number">0</span>); <span class="comment">/* no copying - intentional */</span></span><br><span class="line">	BEGIN(ST_IN_SCRIPTING);</span><br><span class="line">	<span class="keyword">return</span> T_OPEN_TAG_WITH_ECHO;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&lt;INITIAL&gt;<span class="string">"&lt;?"</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> (CG(short_tags)) &#123;</span><br><span class="line">		ZVAL_STRINGL(zendlval, yytext, yyleng, <span class="number">0</span>); <span class="comment">/* no copying - intentional */</span></span><br><span class="line">		BEGIN(ST_IN_SCRIPTING);</span><br><span class="line">		<span class="keyword">return</span> T_OPEN_TAG;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">goto</span> inline_char_handler;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/atom.xml"
+              rel="noopener noreferrer"
+              target="_blank"
+              >
+              RSS
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

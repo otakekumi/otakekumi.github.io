@@ -1236,3 +1236,9 @@ label.el-checkbox {
     white-space: nowrap;
   }
 }
+div .page-number {
+  margin-left: 20px;
+}
+div .extend {
+  margin-left: 20px;
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta name="generator" content="Hexo 3.9.0">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>
+        梅子酒の笔记本
+    </title>
+    <link rel="stylesheet" href="/libs/highlight/styles/monokai-sublime.css">
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body id="bodyx">
+    <div class="hd posts">
+    <a href="/index.html"><i class="fa fa-reply replay-btn" aria-hidden="true"></i></a>
+    <div class="post-title">
+        <p>
+            聊聊PHPVulFinder
+        </p>
+        <hr>
+    </div>
+    <div class="post-content">
+        <h2 id="杂谈"><a class="markdownIt-Anchor" href="#杂谈"></a> 杂谈</h2>
+<p>最近都在搞工作上的事情，涉及到的东西没法分享出来，因此原计划的博客更新计划又被搁置了。国庆时想起来原本打算分享下毕设的项目<a href="https://github.com/meizjm3i/PHPVulFinder" target="_blank" rel="noopener">PHPVulFinder</a>也没有进行，左右一合计，刚好就把这个事儿了结了。</p>
+<p>在谈及具体的技术之前，需要说明的一点是，这个项目是我的毕设题目，并且由于比较严重的拖延症，各种实现也是能拖就拖，直到快答辩时，才草草糊了个危险函数调用识别的部分，因此项目本身还存在很多不足，如果大家觉得写的挺菜，也不用奇怪，你的感觉是正确的。</p>
+<h2 id="总体思路"><a class="markdownIt-Anchor" href="#总体思路"></a> 总体思路</h2>
+<p><a href="https://github.com/meizjm3i/PHPVulFinder" target="_blank" rel="noopener">PHPVulFinder</a>这个项目从名字上来看，和<code>@隐形人真忙</code>师傅的<a href="https://github.com/OneSourceCat/phpvulhunter" target="_blank" rel="noopener">phpvulhunter</a>很接近，因为我做这个项目的初衷也是看到了这个项目以及他的这两篇文章：<a href="https://blog.csdn.net/u011721501/article/details/46271551" target="_blank" rel="noopener">PHP自动化白盒审计技术与实现</a>、<a href="https://blog.csdn.net/u011721501/article/details/44982111" target="_blank" rel="noopener">浅谈PHP自动化代码审计技术</a>。但是在实际实现时，除了对函数预定义直接借用了隐形人师傅的成果外，后续的分析思路差异很大，基本没有可见联系。</p>
+<p>上面是有关于选择PHP静态自动化分析作为毕设题目的初衷，第二个就是有关具体的设计思路了，同样于隐形人师傅关系密切，其来源是知乎上的一个问题：<a href="https://www.zhihu.com/question/27730062" target="_blank" rel="noopener">如何使用AST生成程序的控制流图（CFG）？</a>，目前该问题下有三个回答，我认为都值得一看，即使是从未接触过编译原理的朋友，我相信仔细看完后也能受益匪浅。</p>
+<p>长话短说，对<code>PHPVulFinder</code>这个项目影响最大的是这段内容：</p>
+<blockquote>
+<p>所以正统做法推荐的是在做数据流分析之前，先把AST转换为一种更细粒度的、把控制流显式暴露出来的中间表示（IR）    …</p>
+<p>对数据流分析来说，IR无论是树形、DAG还是线性形式都没关系，只要控制流和数据依赖易于分析就好。SSA形式的IR可以把两者都显式暴露出来，特别是use-def关系（并且有些IR会额外维护def-use关系），所以在现代编译器和程序分析器里比较流行。</p>
+</blockquote>
+<p>因此<code>PHPVulFinder</code>和<code>phpvulhunter</code>最大的区别在于，<code>phpvulhunter</code>尽量直接复用AST来完成CFG的构造，而<code>PHPVulFinder</code>中，我将AST又处理了一次，转换成了更便于分析的四元组。</p>
+<p>除此之外，整个项目的设计思路也就大同小异，大致包括以下三步：</p>
+<ul>
+<li>将PHP-Parser生成的AST转换成更细粒度的四元组</li>
+<li>直接对四元组进行基本块的划分以及构建CFG</li>
+<li>进行依赖分析以及危险调用识别</li>
+</ul>
+<h2 id="ir生成"><a class="markdownIt-Anchor" href="#ir生成"></a> IR生成</h2>
+<p>严谨来说，从PHP-Parser得到的AST也能算是树形IR，为了我自己的描述习惯，此处小标题的<code>IR生成</code>指的是对AST进行处理进而得到四元组。</p>
+<p>通常来讲，四元组会包括四个组成部分：</p>
+<ol>
+<li>类型</li>
+<li>左操作数</li>
+<li>右操作数</li>
+<li>结果</li>
+</ol>
+<p>从PHP-Parser得到的AST转四元组，第一个要处理的就是<code>类型</code>如何给值，庆幸的是，PHP-Parser在设计时就已经考虑了相关的问题，可以直接通过<code>getType()</code>来获取类型。</p>
+<p>当然，并不是所有类型都可以通过<code>getType()</code>来实现类型的赋值，举一个例子，对于一个<code>switch-case</code>结构，必然会拆分成多个四元组，并且每一个<code>case</code>字句都将跳转至不同的流程，此时便不能简单地借助<code>getType()</code>来完成跳转四元组的类型赋值，而是需要创建一个专门用于表示跳转关系的类型，在<code>PHPVulFinder</code>中，名为<code>JUMP</code>，对于JUMP类型的四元组而言，甚至只需要一个操作数来表示跳转地址即可：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;quads[<span class="keyword">$this</span>-&gt;quadId] = <span class="keyword">new</span> Quad(<span class="number">1</span>,<span class="keyword">$this</span>-&gt;quadId,<span class="string">"JUMP"</span>,<span class="keyword">$this</span>-&gt;quads[$now_id]-&gt;result);</span><br></pre></td></tr></table></figure>
+<p>PHP-Parser生成的AST类型复杂，比如就包括了<code>PhpParser\Node\Scalar</code>、<code>PhpParser\Node\Stmt</code>、<code>PhpParser\Node\Expr</code>等等，其中又包含了许多细分情况，从项目代码中也能看出来：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>( $expr <span class="keyword">instanceof</span> PhpParser\Node\Expr\BinaryOp\BooleanAnd ||</span><br><span class="line">    $expr <span class="keyword">instanceof</span> PhpParser\Node\Expr\BinaryOp\BooleanOr   ||</span><br><span class="line">    $expr <span class="keyword">instanceof</span> PhpParser\Node\Expr\BinaryOp\Equal       ||</span><br><span class="line">    $expr <span class="keyword">instanceof</span> PhpParser\Node\Expr\BinaryOp\Concat      ||</span><br><span class="line">    $expr <span class="keyword">instanceof</span> PhpParser\Node\Expr\BinaryOp\Smaller</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这一块基本是个体力活，需要不断根据PHP-Parser的AST类型来补足不同类型的四元组生成考虑。</p>
+<p>除了类型之外，左操作数以及右操作数这两个组成部分的处理可以放在一块说明，以最简单的加法操作而言，左、右操作数无非就是两个数字的相加，但是如果两个函数的结果相加呢？那么这时候的左、右操作数就不再是一个具体的数值了。</p>
+<p>对于两个函数结果相加这种情况，首先需要获取这两个函数的计算结果所在的四元组ID，然后将该四元组ID直接作为相加操作的左右操作数来记录，因此在进行后续的回溯等操作时，可以通过这个ID指向相应的四元组取值。</p>
+<p>因此，在生成四元组时，如果遇到了隐含跳转关系的执行，都可以使用四元组ID来替代左右操作数，这些隐含跳转关系的执行包括但不限于<code>switch-case</code>、<code>x=y?z:q</code>、<code>if</code>、<code>for</code>等等。</p>
+<p>还有一种特殊情况需要处理：函数调用。函数一般可以分为用户自定义函数以及系统内置函数，对于系统内置函数，PHP-Parser可以直接将其识别为具体的调用，比如<code>echo</code>就是<code>PhpParser\Node\Stmt\Echo_</code>、<code>exit</code>就是<code>PhpParser\Node\Expr\Exit_</code>。但对于用户自定义函数而言，一个函数就包括了一个独立的作用域，因此在四元组阶段就需要体现出独立的作用域，我的处理办法是在函数调用前以及函数调用后各自增加一个四元组用于和其他的四元组分隔，代码如下：<a href="https://github.com/meizjm3i/PHPVulFinder/blob/master/AST2IR.php#L326" target="_blank" rel="noopener">Code In Github</a></p>
+<p>一个生成完的四元组样例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">object(Quad)#631 (6) &#123;</span><br><span class="line">    [&quot;label&quot;]=&gt;</span><br><span class="line">    int(0)</span><br><span class="line">    [&quot;id&quot;]=&gt;</span><br><span class="line">    int(1)</span><br><span class="line">    [&quot;op&quot;]=&gt;</span><br><span class="line">    string(11) &quot;Expr_Assign&quot;</span><br><span class="line">    [&quot;arg1&quot;]=&gt;</span><br><span class="line">    NULL</span><br><span class="line">    [&quot;arg2&quot;]=&gt;</span><br><span class="line">    object(PhpParser\Node\Scalar\String_)#602 (2) &#123;</span><br><span class="line">      [&quot;value&quot;]=&gt;</span><br><span class="line">      string(3) &quot;123&quot;</span><br><span class="line">      [&quot;attributes&quot;:protected]=&gt;</span><br><span class="line">      array(3) &#123;</span><br><span class="line">        [&quot;startLine&quot;]=&gt;</span><br><span class="line">        int(15)</span><br><span class="line">        [&quot;endLine&quot;]=&gt;</span><br><span class="line">        int(15)</span><br><span class="line">        [&quot;kind&quot;]=&gt;</span><br><span class="line">        int(2)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    [&quot;result&quot;]=&gt;</span><br><span class="line">    object(PhpParser\Node\Expr\Variable)#601 (2) &#123;</span><br><span class="line">      [&quot;name&quot;]=&gt;</span><br><span class="line">      string(1) &quot;t&quot;</span><br><span class="line">      [&quot;attributes&quot;:protected]=&gt;</span><br><span class="line">      array(2) &#123;</span><br><span class="line">        [&quot;startLine&quot;]=&gt;</span><br><span class="line">        int(15)</span><br><span class="line">        [&quot;endLine&quot;]=&gt;</span><br><span class="line">        int(15)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>整个IR的生成中，基本都是此类细节的考虑以及重写，因此仅举几个例子作为示范，如果有兴趣可以自行分析代码。</p>
+<h2 id="基本块划分以及变量依赖"><a class="markdownIt-Anchor" href="#基本块划分以及变量依赖"></a> 基本块划分以及变量依赖</h2>
+<p>基本块的划分主要按照慕课上哈工大的《编译原理》课程中提及的思路进行，参考地址：<a href="https://www.icourse163.org/learn/HIT-1002123007?tid=1205983229#/learn/content?type=detail&amp;id=1210383516&amp;sm=1" target="_blank" rel="noopener">代码优化1-流图</a></p>
+<p>变量依赖的主要目的是标记出可能受污染变量以及后续的传播途径，此时就需要通过四元组中记录的信息来进行回溯，最终目的是将存在赋值关系的变量都进行污染分析，当到达sink点时就直接触发危险调用报警。</p>
+<p>比如对于下面这段代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">a</span><span class="params">($s)</span></span>&#123;</span><br><span class="line">    $b = $s.<span class="string">"..."</span>;</span><br><span class="line">    $c = <span class="string">"ss"</span>;</span><br><span class="line">    $d = <span class="keyword">array</span>($b,$c);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">b</span><span class="params">($ss)</span></span>&#123;</span><br><span class="line">    <span class="keyword">echo</span> $ss;</span><br><span class="line">    $a = <span class="string">"asd"</span>;</span><br><span class="line">    $b = <span class="string">"dfg"</span>;</span><br><span class="line">    system($b);</span><br><span class="line">    $para = $_GET[<span class="string">'w'</span>];</span><br><span class="line">    $c = <span class="string">"ppp"</span>;</span><br><span class="line">    $cd = <span class="string">"qwe"</span>;</span><br><span class="line">    system($para);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"success"</span>;</span><br><span class="line">&#125;</span><br><span class="line">$t = <span class="string">"123"</span>;</span><br><span class="line">a($t);</span><br><span class="line">$d = <span class="string">"sss"</span>;</span><br><span class="line">$e = $_GET[<span class="string">'p'</span>];</span><br><span class="line">$f = b($e);</span><br></pre></td></tr></table></figure>
+<p>第一个基本块的提取效果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">object(BasicBlock)#696 (3) &#123;</span><br><span class="line">    [&quot;inedge&quot;]=&gt;</span><br><span class="line">    object(Quad)#660 (6) &#123;</span><br><span class="line">      [&quot;label&quot;]=&gt;</span><br><span class="line">      int(0)</span><br><span class="line">      [&quot;id&quot;]=&gt;</span><br><span class="line">      int(1)</span><br><span class="line">      [&quot;op&quot;]=&gt;</span><br><span class="line">      string(11) &quot;Expr_Assign&quot;</span><br><span class="line">      [&quot;arg1&quot;]=&gt;</span><br><span class="line">      NULL</span><br><span class="line">      [&quot;arg2&quot;]=&gt;</span><br><span class="line">      object(PhpParser\Node\Scalar\String_)#629 (2) &#123;</span><br><span class="line">        [&quot;value&quot;]=&gt;</span><br><span class="line">        string(3) &quot;123&quot;</span><br><span class="line">        [&quot;attributes&quot;:protected]=&gt;</span><br><span class="line">        array(3) &#123;</span><br><span class="line">          [&quot;startLine&quot;]=&gt;</span><br><span class="line">          int(21)</span><br><span class="line">          [&quot;endLine&quot;]=&gt;</span><br><span class="line">          int(21)</span><br><span class="line">          [&quot;kind&quot;]=&gt;</span><br><span class="line">          int(2)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      [&quot;result&quot;]=&gt;</span><br><span class="line">      object(PhpParser\Node\Expr\Variable)#628 (2) &#123;</span><br><span class="line">        [&quot;name&quot;]=&gt;</span><br><span class="line">        string(1) &quot;t&quot;</span><br><span class="line">        [&quot;attributes&quot;:protected]=&gt;</span><br><span class="line">        array(2) &#123;</span><br><span class="line">          [&quot;startLine&quot;]=&gt;</span><br><span class="line">          int(21)</span><br><span class="line">          [&quot;endLine&quot;]=&gt;</span><br><span class="line">          int(21)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    [&quot;outedge&quot;]=&gt;</span><br><span class="line">    object(Quad)#662 (6) &#123;</span><br><span class="line">      [&quot;label&quot;]=&gt;</span><br><span class="line">      int(1)</span><br><span class="line">      [&quot;id&quot;]=&gt;</span><br><span class="line">      int(3)</span><br><span class="line">      [&quot;op&quot;]=&gt;</span><br><span class="line">      string(13) &quot;Expr_FuncCall&quot;</span><br><span class="line">      [&quot;arg1&quot;]=&gt;</span><br><span class="line">      object(PhpParser\Node\Name)#632 (2) &#123;</span><br><span class="line">        [&quot;parts&quot;]=&gt;</span><br><span class="line">        array(1) &#123;</span><br><span class="line">          [0]=&gt;</span><br><span class="line">          string(1) &quot;a&quot;</span><br><span class="line">        &#125;</span><br><span class="line">        [&quot;attributes&quot;:protected]=&gt;</span><br><span class="line">        array(2) &#123;</span><br><span class="line">          [&quot;startLine&quot;]=&gt;</span><br><span class="line">          int(22)</span><br><span class="line">          [&quot;endLine&quot;]=&gt;</span><br><span class="line">          int(22)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      [&quot;arg2&quot;]=&gt;</span><br><span class="line">      int(1)</span><br><span class="line">      [&quot;result&quot;]=&gt;</span><br><span class="line">      int(12)</span><br><span class="line">    &#125;</span><br><span class="line">    [&quot;entry&quot;]=&gt;</span><br><span class="line">    int(1)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>字符串变量以及HTTP参数的提取效果:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">object(Variable)#710 (5) &#123;</span><br><span class="line">[&quot;BasicBlockId&quot;]=&gt;</span><br><span class="line">int(0)</span><br><span class="line">[&quot;Varname&quot;]=&gt;</span><br><span class="line">string(1) &quot;t&quot;</span><br><span class="line">[&quot;linenum&quot;]=&gt;</span><br><span class="line">array(2) &#123;</span><br><span class="line">  [0]=&gt;</span><br><span class="line">  int(21)</span><br><span class="line">  [1]=&gt;</span><br><span class="line">  int(21)</span><br><span class="line">&#125;</span><br><span class="line">[&quot;from&quot;]=&gt;</span><br><span class="line">array(2) &#123;</span><br><span class="line">  [0]=&gt;</span><br><span class="line">  NULL</span><br><span class="line">  [1]=&gt;</span><br><span class="line">  object(PhpParser\Node\Scalar\String_)#629 (2) &#123;</span><br><span class="line">    [&quot;value&quot;]=&gt;</span><br><span class="line">    string(3) &quot;123&quot;</span><br><span class="line">    [&quot;attributes&quot;:protected]=&gt;</span><br><span class="line">    array(3) &#123;</span><br><span class="line">      [&quot;startLine&quot;]=&gt;</span><br><span class="line">      int(21)</span><br><span class="line">      [&quot;endLine&quot;]=&gt;</span><br><span class="line">      int(21)</span><br><span class="line">      [&quot;kind&quot;]=&gt;</span><br><span class="line">      int(2)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[&quot;tainted&quot;]=&gt;</span><br><span class="line">int(0)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[11]=&gt;</span><br><span class="line">object(Variable)#716 (5) &#123;</span><br><span class="line">[&quot;BasicBlockId&quot;]=&gt;</span><br><span class="line">int(3)</span><br><span class="line">[&quot;Varname&quot;]=&gt;</span><br><span class="line">string(1) &quot;w&quot;</span><br><span class="line">[&quot;linenum&quot;]=&gt;</span><br><span class="line">array(2) &#123;</span><br><span class="line">  [0]=&gt;</span><br><span class="line">  int(14)</span><br><span class="line">  [1]=&gt;</span><br><span class="line">  int(14)</span><br><span class="line">&#125;</span><br><span class="line">[&quot;from&quot;]=&gt;</span><br><span class="line">string(4) &quot;_GET&quot;</span><br><span class="line">[&quot;tainted&quot;]=&gt;</span><br><span class="line">int(1)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>变量<code>$ss</code>的污染分析结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[8]=&gt;</span><br><span class="line">object(Variable)#719 (5) &#123;</span><br><span class="line">[&quot;BasicBlockId&quot;]=&gt;</span><br><span class="line">int(3)</span><br><span class="line">[&quot;Varname&quot;]=&gt;</span><br><span class="line">string(2) &quot;ss&quot;</span><br><span class="line">[&quot;linenum&quot;]=&gt;</span><br><span class="line">array(2) &#123;</span><br><span class="line">  [0]=&gt;</span><br><span class="line">  int(9)</span><br><span class="line">  [1]=&gt;</span><br><span class="line">  int(9)</span><br><span class="line">&#125;</span><br><span class="line">[&quot;from&quot;]=&gt;</span><br><span class="line">array(1) &#123;</span><br><span class="line">  [0]=&gt;</span><br><span class="line">  int(16)</span><br><span class="line">&#125;</span><br><span class="line">[&quot;tainted&quot;]=&gt;</span><br><span class="line">int(1)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在污点变量的分析中，做的还不是很完善，比如当遇到不支持的赋值、拼接函数时，变量会被污染但是却无法识别，这个项目中存在不少类似的问题，主要原因是毕设的时间紧迫，只能先实现几个基本情况的识别用于交付。</p>
+<p>危险调用识别就不单独列出来讲，一个是这一部分做的十分粗糙，甚至可以说是稀烂，另一个是我暂时没什么很好的思路，只能在污点变量到底sink点时触发危险调用识别。</p>
+<h2 id="phpvulfinder之外"><a class="markdownIt-Anchor" href="#phpvulfinder之外"></a> PHPVulFinder之外</h2>
+<p>这个项目起初的目标是能简单支持对类、命名空间等情况进行分析，但是有点高估自己的开发速度，导致最终留出的开发时间十分紧迫，只勉强做完了这个Demo，但是也还是有一些大致的思路，比如通过类哈希表以及函数哈希表建立映射关系，在生成四元组时通过哈希表来完成，同样的，变量也需要考虑到这种情况下由于作用域的不同所带来的重名、取不到值等情况。</p>
+<p>如果能把这两个问题解决，我想，对于类的静态自动化处理应该还是能做不少事，可惜看不到RIPS新版的代码，我还是比较好奇他们是如何解决这个问题的。</p>
+
+    </div>
+
+    
+</div>
+    <div class="footer" id="footer">
+    <p>Copyright © 2020 Meizj.
+        <!-- <label class="el-switch el-switch-green el-switch-sm" style="vertical-align: sub;">
+            <input type="checkbox" name="switch" id="update_style">
+            <span class="el-switch-style"></span>
+        </label> -->
+<!--         <script type="text/javascript">
+        var cnzz_protocol = (("https:" == document.location.protocol) ? "https://" : "http://");
+        document.write(unescape("%3Cspan id='cnzz_stat_icon_1278548644'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "v1.cnzz.com/stat.php%3Fid%3D1278548644%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+        </script> -->
+    </p>
+</div>
+<input type="hidden" id="web_style" value="black">
+<input type="hidden" id="valine_appid" value="CmCti21ooOOIzFOhEyFkFvR0-gzGzoHsz">
+<input type="hidden" id="valine_appKey" value="FqiyUqbg7McKN2eG0MCewupf">
+<script src="/libs/jquery.min.js"></script>
+<script src="/libs/highlight/highlight.pack.js"></script>
+<script src='//cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js'></script>
+<script src="/js/js.js"></script>
+<style type="text/css">
+.v * {
+    color: #698fca;
+}
+
+.v .vlist .vcard .vhead .vsys {
+    color: #3a3e4a;
+}
+
+.v .vlist .vcard .vh .vmeta .vat {
+    color: #638fd5;
+}
+
+.v .vlist .vcard .vhead .vnick {
+    color: #6ba1ff;
+}
+
+.v a {
+    color: #8696b1;
+}
+
+.v .vlist .vcard .vhead .vnick:hover {
+    color: #669bfc;
+}
+</style>
+</body>
+
+</html>
